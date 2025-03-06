@@ -1,17 +1,25 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
+// Copyright (c) 2025 Adita.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Adita.PlexNet.Opc.Ua.Abstractions.Channels;
 
-namespace Adita.PlexNet.Opc.Ua
+namespace Adita.PlexNet.Opc.Ua.Extensions
 {
-    public static class NodeManagementServiceSet
+    /// <summary>
+    /// Represents a node management service set extensions.
+    /// </summary>
+    public static class NodeManagementServiceSetExtensions
     {
         /// <summary>
         /// Adds one or more Nodes into the AddressSpace hierarchy.
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="AddNodesRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="AddNodesResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.7.2/">OPC UA specification Part 4: Services, 5.7.2</seealso>
         public static async Task<AddNodesResponse> AddNodesAsync(this IRequestChannel channel, AddNodesRequest request, CancellationToken token = default)
@@ -29,6 +37,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="AddReferencesRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="AddReferencesResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.7.3/">OPC UA specification Part 4: Services, 5.7.3</seealso>
         public static async Task<AddReferencesResponse> AddReferencesAsync(this IRequestChannel channel, AddReferencesRequest request, CancellationToken token = default)
@@ -46,6 +55,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="DeleteNodesRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="DeleteNodesResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.7.4/">OPC UA specification Part 4: Services, 5.7.4</seealso>
         public static async Task<DeleteNodesResponse> DeleteNodesAsync(this IRequestChannel channel, DeleteNodesRequest request, CancellationToken token = default)
@@ -63,6 +73,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="DeleteReferencesRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="DeleteReferencesResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.7.5/">OPC UA specification Part 4: Services, 5.7.5</seealso>
         public static async Task<DeleteReferencesResponse> DeleteReferencesAsync(this IRequestChannel channel, DeleteReferencesRequest request, CancellationToken token = default)

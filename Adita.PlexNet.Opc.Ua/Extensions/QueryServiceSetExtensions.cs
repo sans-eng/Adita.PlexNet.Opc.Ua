@@ -1,17 +1,25 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
+// Copyright (c) 2025 Adita.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Adita.PlexNet.Opc.Ua.Abstractions.Channels;
 
-namespace Adita.PlexNet.Opc.Ua
+namespace Adita.PlexNet.Opc.Ua.Extensions
 {
-    public static class QueryServiceSet
+    /// <summary>
+    /// Represents a query service set extensions.
+    /// </summary>
+    public static class QueryServiceSetExtensions
     {
         /// <summary>
         /// Issues a Query request to a View.
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="QueryFirstRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="QueryFirstResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.9.3/">OPC UA specification Part 4: Services, 5.9.3</seealso>
         public static async Task<QueryFirstResponse> QueryFirstAsync(this IRequestChannel channel, QueryFirstRequest request, CancellationToken token = default)
@@ -29,6 +37,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// </summary>
         /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
         /// <param name="request">A <see cref="QueryNextRequest"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="QueryNextResponse"/>.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.9.4/">OPC UA specification Part 4: Services, 5.9.4</seealso>
         public static async Task<QueryNextResponse> QueryNextAsync(this IRequestChannel channel, QueryNextRequest request, CancellationToken token = default)

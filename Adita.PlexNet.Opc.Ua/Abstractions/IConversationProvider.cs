@@ -20,6 +20,7 @@ namespace Adita.PlexNet.Opc.Ua.Abstractions
         /// <param name="options">The transport connection options.</param>
         /// <param name="certificateStore">The certificate store.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>An <see cref="IConversation"/> instance.</returns>
         Task<IConversation> CreateAsync(EndpointDescription remoteEndpoint, ApplicationDescription localDescription, TransportConnectionOptions options, ICertificateStore? certificateStore, ILogger? logger, CancellationToken token);
     }

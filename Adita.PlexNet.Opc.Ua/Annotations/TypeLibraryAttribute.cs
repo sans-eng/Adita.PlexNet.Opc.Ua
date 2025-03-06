@@ -13,7 +13,7 @@ namespace Adita.PlexNet.Opc.Ua.Annotations
     public sealed class TypeLibraryAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="ApplicationPartAttribute" />.
+        /// Initializes a new instance of <see cref="TypeLibraryAttribute" />.
         /// </summary>
         public TypeLibraryAttribute()
         {

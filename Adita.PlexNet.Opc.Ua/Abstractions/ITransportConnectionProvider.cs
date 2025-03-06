@@ -19,6 +19,7 @@ namespace Adita.PlexNet.Opc.Ua.Abstractions
         /// method.
         /// </remarks>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>The transport connection.</returns>
         Task<ITransportConnection> ConnectAsync(string connectionString, CancellationToken token);
     }

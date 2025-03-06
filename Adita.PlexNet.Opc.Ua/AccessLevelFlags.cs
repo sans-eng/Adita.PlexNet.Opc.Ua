@@ -3,6 +3,9 @@
 
 namespace Adita.PlexNet.Opc.Ua
 {
+    /// <summary>
+    /// Defines an access level flag.
+    /// </summary>
     [Flags]
     public enum AccessLevelFlags : byte
     {

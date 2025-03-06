@@ -52,6 +52,7 @@ namespace Adita.PlexNet.Opc.Ua.Channels
         /// <param name="remoteEndpoint">The remote endpoint</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="options">The secure channel options.</param>
+        /// <param name="stackProfile">A <see cref="StackProfile"/> to set.</param>
         public ClientSecureChannel(
             ApplicationDescription localDescription,
             ICertificateStore? certificateStore,
@@ -126,16 +127,24 @@ namespace Adita.PlexNet.Opc.Ua.Channels
         /// </summary>
         public IReadOnlyList<string> ServerUris { get; protected set; }
 
+        /// <summary>
+        /// Gets a maximum length of string that current <see cref="ClientSecureChannel"/> supported.
+        /// </summary>
         public int MaxStringLength => 65535;
-
+        /// <summary>
+        /// Gets a maximum length of array that current <see cref="ClientSecureChannel"/> supported.
+        /// </summary>
         public int MaxArrayLength => 65535;
-
+        /// <summary>
+        /// Gets a maximum length of byte string that current <see cref="ClientSecureChannel"/> supported.
+        /// </summary>
         public int MaxByteStringLength => 65535;
 
         /// <summary>
         /// Sends a <see cref="T:Workstation.ServiceModel.Ua.IServiceRequest"/> to the server.
         /// </summary>
         /// <param name="request">The request.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public virtual async Task<IServiceResponse> RequestAsync(IServiceRequest request, CancellationToken token = default)
         {

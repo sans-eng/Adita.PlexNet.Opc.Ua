@@ -13,18 +13,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
+    <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\favicon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />

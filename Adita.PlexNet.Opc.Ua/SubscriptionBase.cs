@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Adita.PlexNet.Opc.Ua;
 using Adita.PlexNet.Opc.Ua.Abstractions;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Applications;

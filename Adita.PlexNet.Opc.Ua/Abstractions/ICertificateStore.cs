@@ -17,6 +17,7 @@ namespace Adita.PlexNet.Opc.Ua.Abstractions
         /// </summary>
         /// <param name="applicationDescription">The application description.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>The local certificate and private key.</returns>
         Task<(X509Certificate? Certificate, RsaKeyParameters? Key)> GetLocalCertificateAsync(ApplicationDescription applicationDescription, ILogger? logger, CancellationToken token);
 
@@ -25,6 +26,7 @@ namespace Adita.PlexNet.Opc.Ua.Abstractions
         /// </summary>
         /// <param name="certificate">The remote certificate.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>The validator result.</returns>
         Task<bool> ValidateRemoteCertificateAsync(X509Certificate certificate, ILogger? logger, CancellationToken token);
     }

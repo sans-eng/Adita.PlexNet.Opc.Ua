@@ -172,8 +172,9 @@ namespace Adita.PlexNet.Opc.Ua.Channels
         /// </summary>
         /// <param name="securityPolicyUri">The security policy URI.</param>
         /// <param name="remoteCertificate">The remote certificate.</param>
+        /// <param name="cancelationToken">A <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SetRemoteCertificateAsync(string? securityPolicyUri, byte[]? remoteCertificate, CancellationToken token)
+        public async Task SetRemoteCertificateAsync(string? securityPolicyUri, byte[]? remoteCertificate, CancellationToken cancelationToken = default)
         {
             _securityPolicyUri = securityPolicyUri;
             _remoteCertificate = remoteCertificate;
@@ -185,7 +186,7 @@ namespace Adita.PlexNet.Opc.Ua.Channels
                 {
                     if (_certificateStore != null)
                     {
-                        var result = await _certificateStore.ValidateRemoteCertificateAsync(cert, _logger, token);
+                        var result = await _certificateStore.ValidateRemoteCertificateAsync(cert, _logger, cancelationToken);
                         if (!result)
                         {
                             throw new ServiceResultException(StatusCodes.BadSecurityChecksFailed, "Remote certificate is untrusted.");
@@ -218,7 +219,7 @@ namespace Adita.PlexNet.Opc.Ua.Channels
             {
                 if (_localCertificate == null && _certificateStore != null)
                 {
-                    var tuple = await _certificateStore.GetLocalCertificateAsync(_localDescription, _logger, token);
+                    var tuple = await _certificateStore.GetLocalCertificateAsync(_localDescription, _logger, cancelationToken);
                     _localCertificate = tuple.Certificate?.GetEncoded();
                     _localPrivateKey = tuple.Key;
                 }
