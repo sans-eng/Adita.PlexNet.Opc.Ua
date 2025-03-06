@@ -229,6 +229,11 @@ namespace Adita.PlexNet.Opc.Ua
         #endregion Protected Properties
 
         #region Public methods
+        /// <summary>
+        /// Sets an error to current <see cref="SubscriptionBase"/>.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that has errors.</param>
+        /// <param name="errors">An <see cref="IEnumerable{T}"/> of string that contains error.</param>
         public void SetErrors(string propertyName, IEnumerable<string>? errors)
         {
             if (!_errors.TryGetValue(propertyName, out var propertyErrors))
@@ -242,7 +247,7 @@ namespace Adita.PlexNet.Opc.Ua
                 propertyErrors.Clear();
             }
 
-            if(errors?.Count() > 0)
+            if (errors?.Count() > 0)
             {
                 propertyErrors.AddRange(errors);
             }
@@ -452,17 +457,25 @@ namespace Adita.PlexNet.Opc.Ua
                 return;
             }
 
-            if (_monitoredItems.TryGetValueByName(e.PropertyName, out var item) && item.TryGetValue(out var value))
+
+            if (_monitoredItems.TryGetValueByName(e.PropertyName, out var item))
             {
-                StatusCode statusCode;
+                StatusCode statusCode = StatusCodes.Good;
+
+                Type? serverType = null;
+
                 try
                 {
-                    var writeRequest = new WriteRequest
+                    var readRequest = new ReadRequest()
                     {
-                        NodesToWrite = [new WriteValue { NodeId = ExpandedNodeId.ToNodeId(item.NodeId, InnerChannel.NamespaceUris), AttributeId = item.AttributeId, IndexRange = item.IndexRange, Value = value }]
+                        NodesToRead = [new ReadValueId() { AttributeId = AttributeIds.Value,
+                        NodeId = ExpandedNodeId.ToNodeId(item.NodeId, InnerChannel.NamespaceUris) }],
+                        TimestampsToReturn = TimestampsToReturn.Neither
                     };
-                    var writeResponse = await InnerChannel.WriteAsync(writeRequest).ConfigureAwait(false);
-                    statusCode = writeResponse?.Results?[0] ?? StatusCodes.BadDataEncodingInvalid;
+
+                    var readResponse = await InnerChannel.ReadAsync(readRequest);
+
+                    serverType = readResponse.Results?.FirstOrDefault()?.Value?.GetType();
                 }
                 catch (ServiceResultException ex)
                 {
@@ -471,6 +484,27 @@ namespace Adita.PlexNet.Opc.Ua
                 catch (Exception)
                 {
                     statusCode = StatusCodes.BadServerNotConnected;
+                }
+
+                if (item.TryGetValue(out var value, serverType))
+                {
+                    try
+                    {
+                        var writeRequest = new WriteRequest
+                        {
+                            NodesToWrite = [new WriteValue { NodeId = ExpandedNodeId.ToNodeId(item.NodeId, InnerChannel.NamespaceUris), AttributeId = item.AttributeId, IndexRange = item.IndexRange, Value = value }]
+                        };
+                        var writeResponse = await InnerChannel.WriteAsync(writeRequest).ConfigureAwait(false);
+                        statusCode = writeResponse?.Results?[0] ?? StatusCodes.BadDataEncodingInvalid;
+                    }
+                    catch (ServiceResultException ex)
+                    {
+                        statusCode = ex.StatusCode;
+                    }
+                    catch (Exception)
+                    {
+                        statusCode = StatusCodes.BadServerNotConnected;
+                    }
                 }
 
                 item.OnWriteResult(statusCode);

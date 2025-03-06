@@ -6,6 +6,7 @@ using Adita.PlexNet.Opc.Ua.Collections;
 using Adita.PlexNet.Opc.Ua.Events;
 using Adita.PlexNet.Opc.Ua.Extensions;
 using Adita.PlexNet.Opc.Ua.Utils;
+using System.Numerics;
 using System.Reflection;
 
 namespace Adita.PlexNet.Opc.Ua
@@ -112,7 +113,7 @@ namespace Adita.PlexNet.Opc.Ua
 
         public abstract void Publish(Variant[] eventFields);
 
-        public abstract bool TryGetValue(out DataValue? value);
+        public abstract bool TryGetValue(out DataValue? value, Type? serverType = default);
 
         public abstract void OnCreateResult(MonitoredItemCreateResult result);
 
@@ -164,7 +165,7 @@ namespace Adita.PlexNet.Opc.Ua
         {
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             var pi = Property;
             if (pi.CanRead)
@@ -255,7 +256,7 @@ namespace Adita.PlexNet.Opc.Ua
         {
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             var pi = Property;
             if (pi.CanRead)
@@ -346,7 +347,7 @@ namespace Adita.PlexNet.Opc.Ua
         {
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             value = default(DataValue);
             return false;
@@ -424,6 +425,7 @@ namespace Adita.PlexNet.Opc.Ua
         public override void Publish(DataValue dataValue)
         {
             var value = dataValue.GetValueOrDefault<T>();
+
             Property.SetValue(Target, value);
             SetDataErrorInfo(dataValue.StatusCode);
         }
@@ -432,12 +434,22 @@ namespace Adita.PlexNet.Opc.Ua
         {
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             var pi = Property;
             if (pi.CanRead)
             {
-                value = new DataValue(Property.GetValue(Target));
+                var propertyValue = Property.GetValue(Target);
+                if (propertyValue?.GetType().IsEnum == true && serverType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBinaryInteger<>)) == true)
+                {
+                    var convertedValue = Convert.ChangeType(propertyValue, serverType);
+                    value = new DataValue(convertedValue);
+                }
+                else
+                {
+                    value = new DataValue(propertyValue);
+                }
+
                 return true;
             }
             value = default(DataValue);
@@ -523,7 +535,7 @@ namespace Adita.PlexNet.Opc.Ua
             Property.SetValue(Target, currentEvent);
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             value = default(DataValue);
             return false;
@@ -610,7 +622,7 @@ namespace Adita.PlexNet.Opc.Ua
             queue.Enqueue(currentEvent);
         }
 
-        public override bool TryGetValue(out DataValue? value)
+        public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
             value = default(DataValue);
             return false;

@@ -2,12 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Adita.PlexNet.Opc.Ua.Extensions;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Numerics;
 
 namespace Adita.PlexNet.Opc.Ua.Extensions
 {
+    /// <summary>
+    /// Represents a <see cref="DataValue"/> extensions.
+    /// </summary>
     public static class DataValueExtensions
     {
         /// <summary>
@@ -80,12 +82,15 @@ namespace Adita.PlexNet.Opc.Ua.Extensions
 
                 default:
                     // handle built-in type
-                    if (value is T t)
+                    if (typeof(T).IsEnum && value?.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBinaryInteger<>)) == true && Enum.IsDefined(typeof(T), value))
+                    {
+                        return (T)Enum.ToObject(typeof(T), value);
+                    }
+                    else if (value is T t)
                     {
                         return t;
                     }
                     return default!;
-
             }
         }
 
