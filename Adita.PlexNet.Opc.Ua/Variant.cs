@@ -897,7 +897,7 @@ namespace Adita.PlexNet.Opc.Ua
             }
         }
 
-        public object? Value { get; }
+        public object? Value { get;}
 
         public VariantType Type { get; }
 

@@ -59,6 +59,7 @@ try
 // Auto-generated code requires an explicit `#nullable` directive in source.
 #nullable enable
 
+using MediatR;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encoders;
@@ -180,7 +181,9 @@ string RenderBaseTypes(CodeTypeDeclaration type)
     var isRequest = props.Any(pp=>pp.Name == "RequestHeader");
     if (isRequest)
     {
-        return " : IServiceRequest";
+        var responseName = $"{type.Name.Replace("Request", "Response")}";
+
+        return $" : IServiceRequest, IRequest<{responseName}>";
     }
     var isResponse = props.Any(pp=>pp.Name == "ResponseHeader");
     if (isResponse)

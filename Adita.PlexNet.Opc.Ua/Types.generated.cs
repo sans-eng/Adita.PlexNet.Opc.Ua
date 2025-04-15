@@ -11,6 +11,7 @@
 // Auto-generated code requires an explicit `#nullable` directive in source.
 #nullable enable
 
+using MediatR;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encoders;
@@ -2998,7 +2999,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.FindServersRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.FindServersRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.FindServersRequest)]
-    public class FindServersRequest : IServiceRequest
+    public class FindServersRequest : IServiceRequest, IRequest<FindServersResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public String? EndpointUrl { get; set; }
@@ -3076,7 +3077,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.FindServersOnNetworkRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.FindServersOnNetworkRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.FindServersOnNetworkRequest)]
-    public class FindServersOnNetworkRequest : IServiceRequest
+    public class FindServersOnNetworkRequest : IServiceRequest, IRequest<FindServersOnNetworkResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 StartingRecordId { get; set; }
@@ -3129,7 +3130,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.GetEndpointsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.GetEndpointsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.GetEndpointsRequest)]
-    public class GetEndpointsRequest : IServiceRequest
+    public class GetEndpointsRequest : IServiceRequest, IRequest<GetEndpointsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public String? EndpointUrl { get; set; }
@@ -3219,7 +3220,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.RegisterServerRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.RegisterServerRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.RegisterServerRequest)]
-    public class RegisterServerRequest : IServiceRequest
+    public class RegisterServerRequest : IServiceRequest, IRequest<RegisterServerResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public RegisteredServer? Server { get; set; }
@@ -3300,7 +3301,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.RegisterServer2Request_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.RegisterServer2Request_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.RegisterServer2Request)]
-    public class RegisterServer2Request : IServiceRequest
+    public class RegisterServer2Request : IServiceRequest, IRequest<RegisterServer2Response>
     {
         public RequestHeader? RequestHeader { get; set; }
         public RegisteredServer? Server { get; set; }
@@ -3378,7 +3379,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.OpenSecureChannelRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.OpenSecureChannelRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.OpenSecureChannelRequest)]
-    public class OpenSecureChannelRequest : IServiceRequest
+    public class OpenSecureChannelRequest : IServiceRequest, IRequest<OpenSecureChannelResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 ClientProtocolVersion { get; set; }
@@ -3440,7 +3441,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CloseSecureChannelRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CloseSecureChannelRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CloseSecureChannelRequest)]
-    public class CloseSecureChannelRequest : IServiceRequest
+    public class CloseSecureChannelRequest : IServiceRequest, IRequest<CloseSecureChannelResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public virtual void Encode(IEncoder encoder)
@@ -3522,7 +3523,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CreateSessionRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CreateSessionRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CreateSessionRequest)]
-    public class CreateSessionRequest : IServiceRequest
+    public class CreateSessionRequest : IServiceRequest, IRequest<CreateSessionResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public ApplicationDescription? ClientDescription { get; set; }
@@ -3720,7 +3721,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.ActivateSessionRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.ActivateSessionRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.ActivateSessionRequest)]
-    public class ActivateSessionRequest : IServiceRequest
+    public class ActivateSessionRequest : IServiceRequest, IRequest<ActivateSessionResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public SignatureData? ClientSignature { get; set; }
@@ -3782,7 +3783,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CloseSessionRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CloseSessionRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CloseSessionRequest)]
-    public class CloseSessionRequest : IServiceRequest
+    public class CloseSessionRequest : IServiceRequest, IRequest<CloseSessionResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Boolean DeleteSubscriptions { get; set; }
@@ -3823,7 +3824,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CancelRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CancelRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CancelRequest)]
-    public class CancelRequest : IServiceRequest
+    public class CancelRequest : IServiceRequest, IRequest<CancelResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 RequestHandle { get; set; }
@@ -4213,7 +4214,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.AddNodesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.AddNodesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.AddNodesRequest)]
-    public class AddNodesRequest : IServiceRequest
+    public class AddNodesRequest : IServiceRequest, IRequest<AddNodesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public AddNodesItem?[]? NodesToAdd { get; set; }
@@ -4294,7 +4295,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.AddReferencesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.AddReferencesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.AddReferencesRequest)]
-    public class AddReferencesRequest : IServiceRequest
+    public class AddReferencesRequest : IServiceRequest, IRequest<AddReferencesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public AddReferencesItem?[]? ReferencesToAdd { get; set; }
@@ -4363,7 +4364,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.DeleteNodesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.DeleteNodesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.DeleteNodesRequest)]
-    public class DeleteNodesRequest : IServiceRequest
+    public class DeleteNodesRequest : IServiceRequest, IRequest<DeleteNodesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public DeleteNodesItem?[]? NodesToDelete { get; set; }
@@ -4441,7 +4442,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.DeleteReferencesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.DeleteReferencesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.DeleteReferencesRequest)]
-    public class DeleteReferencesRequest : IServiceRequest
+    public class DeleteReferencesRequest : IServiceRequest, IRequest<DeleteReferencesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public DeleteReferencesItem?[]? ReferencesToDelete { get; set; }
@@ -4609,7 +4610,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.BrowseRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.BrowseRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.BrowseRequest)]
-    public class BrowseRequest : IServiceRequest
+    public class BrowseRequest : IServiceRequest, IRequest<BrowseResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public ViewDescription? View { get; set; }
@@ -4662,7 +4663,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.BrowseNextRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.BrowseNextRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.BrowseNextRequest)]
-    public class BrowseNextRequest : IServiceRequest
+    public class BrowseNextRequest : IServiceRequest, IRequest<BrowseNextResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Boolean ReleaseContinuationPoints { get; set; }
@@ -4778,7 +4779,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.TranslateBrowsePathsToNodeIdsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.TranslateBrowsePathsToNodeIdsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.TranslateBrowsePathsToNodeIdsRequest)]
-    public class TranslateBrowsePathsToNodeIdsRequest : IServiceRequest
+    public class TranslateBrowsePathsToNodeIdsRequest : IServiceRequest, IRequest<TranslateBrowsePathsToNodeIdsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public BrowsePath?[]? BrowsePaths { get; set; }
@@ -4825,7 +4826,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.RegisterNodesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.RegisterNodesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.RegisterNodesRequest)]
-    public class RegisterNodesRequest : IServiceRequest
+    public class RegisterNodesRequest : IServiceRequest, IRequest<RegisterNodesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public NodeId?[]? NodesToRegister { get; set; }
@@ -4869,7 +4870,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.UnregisterNodesRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.UnregisterNodesRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.UnregisterNodesRequest)]
-    public class UnregisterNodesRequest : IServiceRequest
+    public class UnregisterNodesRequest : IServiceRequest, IRequest<UnregisterNodesResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public NodeId?[]? NodesToUnregister { get; set; }
@@ -5128,7 +5129,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.QueryFirstRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.QueryFirstRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.QueryFirstRequest)]
-    public class QueryFirstRequest : IServiceRequest
+    public class QueryFirstRequest : IServiceRequest, IRequest<QueryFirstResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public ViewDescription? View { get; set; }
@@ -5196,7 +5197,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.QueryNextRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.QueryNextRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.QueryNextRequest)]
-    public class QueryNextRequest : IServiceRequest
+    public class QueryNextRequest : IServiceRequest, IRequest<QueryNextResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Boolean ReleaseContinuationPoint { get; set; }
@@ -5274,7 +5275,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.ReadRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.ReadRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.ReadRequest)]
-    public class ReadRequest : IServiceRequest
+    public class ReadRequest : IServiceRequest, IRequest<ReadResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Double MaxAge { get; set; }
@@ -5767,7 +5768,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.HistoryReadRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.HistoryReadRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.HistoryReadRequest)]
-    public class HistoryReadRequest : IServiceRequest
+    public class HistoryReadRequest : IServiceRequest, IRequest<HistoryReadResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public HistoryReadDetails? HistoryReadDetails { get; set; }
@@ -5851,7 +5852,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.WriteRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.WriteRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.WriteRequest)]
-    public class WriteRequest : IServiceRequest
+    public class WriteRequest : IServiceRequest, IRequest<WriteResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public WriteValue?[]? NodesToWrite { get; set; }
@@ -6086,7 +6087,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.HistoryUpdateRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.HistoryUpdateRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.HistoryUpdateRequest)]
-    public class HistoryUpdateRequest : IServiceRequest
+    public class HistoryUpdateRequest : IServiceRequest, IRequest<HistoryUpdateResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public HistoryUpdateDetails?[]? HistoryUpdateDetails { get; set; }
@@ -6186,7 +6187,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CallRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CallRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CallRequest)]
-    public class CallRequest : IServiceRequest
+    public class CallRequest : IServiceRequest, IRequest<CallResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public CallMethodRequest?[]? MethodsToCall { get; set; }
@@ -6390,7 +6391,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CreateMonitoredItemsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CreateMonitoredItemsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CreateMonitoredItemsRequest)]
-    public class CreateMonitoredItemsRequest : IServiceRequest
+    public class CreateMonitoredItemsRequest : IServiceRequest, IRequest<CreateMonitoredItemsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6493,7 +6494,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.ModifyMonitoredItemsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.ModifyMonitoredItemsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.ModifyMonitoredItemsRequest)]
-    public class ModifyMonitoredItemsRequest : IServiceRequest
+    public class ModifyMonitoredItemsRequest : IServiceRequest, IRequest<ModifyMonitoredItemsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6546,7 +6547,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.SetMonitoringModeRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.SetMonitoringModeRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.SetMonitoringModeRequest)]
-    public class SetMonitoringModeRequest : IServiceRequest
+    public class SetMonitoringModeRequest : IServiceRequest, IRequest<SetMonitoringModeResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6599,7 +6600,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.SetTriggeringRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.SetTriggeringRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.SetTriggeringRequest)]
-    public class SetTriggeringRequest : IServiceRequest
+    public class SetTriggeringRequest : IServiceRequest, IRequest<SetTriggeringResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6661,7 +6662,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.DeleteMonitoredItemsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.DeleteMonitoredItemsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.DeleteMonitoredItemsRequest)]
-    public class DeleteMonitoredItemsRequest : IServiceRequest
+    public class DeleteMonitoredItemsRequest : IServiceRequest, IRequest<DeleteMonitoredItemsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6711,7 +6712,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.CreateSubscriptionRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.CreateSubscriptionRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.CreateSubscriptionRequest)]
-    public class CreateSubscriptionRequest : IServiceRequest
+    public class CreateSubscriptionRequest : IServiceRequest, IRequest<CreateSubscriptionResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Double RequestedPublishingInterval { get; set; }
@@ -6779,7 +6780,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.ModifySubscriptionRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.ModifySubscriptionRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.ModifySubscriptionRequest)]
-    public class ModifySubscriptionRequest : IServiceRequest
+    public class ModifySubscriptionRequest : IServiceRequest, IRequest<ModifySubscriptionResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -6844,7 +6845,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.SetPublishingModeRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.SetPublishingModeRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.SetPublishingModeRequest)]
-    public class SetPublishingModeRequest : IServiceRequest
+    public class SetPublishingModeRequest : IServiceRequest, IRequest<SetPublishingModeResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public Boolean PublishingEnabled { get; set; }
@@ -7070,7 +7071,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.PublishRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.PublishRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.PublishRequest)]
-    public class PublishRequest : IServiceRequest
+    public class PublishRequest : IServiceRequest, IRequest<PublishResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public SubscriptionAcknowledgement?[]? SubscriptionAcknowledgements { get; set; }
@@ -7129,7 +7130,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.RepublishRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.RepublishRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.RepublishRequest)]
-    public class RepublishRequest : IServiceRequest
+    public class RepublishRequest : IServiceRequest, IRequest<RepublishResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32 SubscriptionId { get; set; }
@@ -7198,7 +7199,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.TransferSubscriptionsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.TransferSubscriptionsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.TransferSubscriptionsRequest)]
-    public class TransferSubscriptionsRequest : IServiceRequest
+    public class TransferSubscriptionsRequest : IServiceRequest, IRequest<TransferSubscriptionsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32[]? SubscriptionIds { get; set; }
@@ -7248,7 +7249,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.DeleteSubscriptionsRequest_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.DeleteSubscriptionsRequest_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.DeleteSubscriptionsRequest)]
-    public class DeleteSubscriptionsRequest : IServiceRequest
+    public class DeleteSubscriptionsRequest : IServiceRequest, IRequest<DeleteSubscriptionsResponse>
     {
         public RequestHeader? RequestHeader { get; set; }
         public UInt32[]? SubscriptionIds { get; set; }

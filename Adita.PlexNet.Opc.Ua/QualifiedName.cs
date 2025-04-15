@@ -20,9 +20,9 @@ namespace Adita.PlexNet.Opc.Ua
             NamespaceIndex = namespaceIndex;
         }
 
-        public string? Name { get; private set; }
+        public string? Name { get; set; }
 
-        public ushort NamespaceIndex { get; private set; }
+        public ushort NamespaceIndex { get; set; }
 
         public static bool TryParse(string s, out QualifiedName qname)
         {

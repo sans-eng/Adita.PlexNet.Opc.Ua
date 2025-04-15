@@ -73,11 +73,11 @@ namespace Adita.PlexNet.Opc.Ua
             IdType = IdType.Opaque;
         }
 
-        public ushort NamespaceIndex { get; }
+        public ushort NamespaceIndex { get; set; }
 
-        public object Identifier { get; }
+        public object Identifier { get; set; }
 
-        public IdType IdType { get; }
+        public IdType IdType { get; set; }
 
         public static bool IsNull(NodeId nodeId)
         {
