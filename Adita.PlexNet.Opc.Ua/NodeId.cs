@@ -6,6 +6,7 @@ using Adita.PlexNet.Opc.Ua.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -14,6 +15,13 @@ namespace Adita.PlexNet.Opc.Ua
     public class NodeId : IEquatable<NodeId?>
     {
         public static readonly NodeId Null = new NodeId(0);
+        [JsonConstructor]
+        public NodeId(ushort namespaceIndex, object identifier, IdType idType)
+        {
+            NamespaceIndex = namespaceIndex;
+            Identifier = identifier;
+            IdType = idType;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeId"/> class.
@@ -73,11 +81,11 @@ namespace Adita.PlexNet.Opc.Ua
             IdType = IdType.Opaque;
         }
 
-        public ushort NamespaceIndex { get; set; }
+        public ushort NamespaceIndex { get; }
 
-        public object Identifier { get; set; }
+        public object Identifier { get;}
 
-        public IdType IdType { get; set; }
+        public IdType IdType { get;}
 
         public static bool IsNull(NodeId nodeId)
         {

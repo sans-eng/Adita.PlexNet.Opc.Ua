@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Adita.PlexNet.Opc.Ua.Annotations;
+using System.Text.Json.Serialization;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -17,10 +18,10 @@ namespace Adita.PlexNet.Opc.Ua
             ServerTimestamp = serverTimestamp;
             ServerPicoseconds = serverPicoseconds;
         }
-
-        public DataValue(Variant value, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
+        [JsonConstructor]
+        public DataValue(Variant variant, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
         {
-            Variant = value;
+            Variant = variant;
             StatusCode = statusCode;
             SourceTimestamp = sourceTimestamp;
             SourcePicoseconds = sourcePicoseconds;
@@ -28,6 +29,7 @@ namespace Adita.PlexNet.Opc.Ua
             ServerPicoseconds = serverPicoseconds;
         }
 
+        [JsonIgnore]
         public object? Value
         {
             get { return Variant.Value; }
