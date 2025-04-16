@@ -5,6 +5,7 @@ using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using System.Globalization;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 
 namespace Adita.PlexNet.Opc.Ua
@@ -106,6 +107,13 @@ namespace Adita.PlexNet.Opc.Ua
             */
         };
 
+        [JsonConstructor]
+        public Variant(object? value, VariantType type, int[]? arrayDimensions = default)
+        {
+            Value = value;
+            Type = type;
+            ArrayDimensions = arrayDimensions;
+        }
         public Variant(object? value)
         {
             if (value == null)
