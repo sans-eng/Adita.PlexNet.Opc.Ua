@@ -9,6 +9,7 @@ namespace Adita.PlexNet.Opc.Ua
     [DataTypeId(DataTypeIds.DataValue)]
     public sealed class DataValue
     {
+        [JsonConstructor]
         public DataValue(object? value, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
         {
             Variant = new Variant(value);
@@ -18,7 +19,6 @@ namespace Adita.PlexNet.Opc.Ua
             ServerTimestamp = serverTimestamp;
             ServerPicoseconds = serverPicoseconds;
         }
-        [JsonConstructor]
         public DataValue(Variant variant, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
         {
             Variant = variant;
@@ -29,7 +29,6 @@ namespace Adita.PlexNet.Opc.Ua
             ServerPicoseconds = serverPicoseconds;
         }
 
-        [JsonIgnore]
         public object? Value
         {
             get { return Variant.Value; }
