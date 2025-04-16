@@ -15,7 +15,7 @@
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
     <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 

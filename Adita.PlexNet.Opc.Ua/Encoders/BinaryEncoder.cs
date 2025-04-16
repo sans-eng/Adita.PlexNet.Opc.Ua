@@ -911,7 +911,7 @@ namespace Adita.PlexNet.Opc.Ua.Encoders
             }
 
             byte b = 0;
-            if (!Variant.IsNull(value.Variant))
+            if (!Variant.IsNull(value.WrappedValue))
             {
                 b |= 1;
             }
@@ -944,7 +944,7 @@ namespace Adita.PlexNet.Opc.Ua.Encoders
             WriteByte(null, b);
             if ((b & 1) != 0)
             {
-                WriteVariant(null, value.Variant);
+                WriteVariant(null, value.WrappedValue);
             }
 
             if ((b & 2) != 0)

@@ -9,42 +9,47 @@ namespace Adita.PlexNet.Opc.Ua
     [DataTypeId(DataTypeIds.DataValue)]
     public sealed class DataValue
     {
-        [JsonConstructor]
         public DataValue(object? value, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
         {
-            Variant = new Variant(value);
+            WrappedValue = new Variant(value);
             StatusCode = statusCode;
             SourceTimestamp = sourceTimestamp;
             SourcePicoseconds = sourcePicoseconds;
             ServerTimestamp = serverTimestamp;
             ServerPicoseconds = serverPicoseconds;
         }
-        public DataValue(Variant variant, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
+        [JsonConstructor]
+        public DataValue(Variant wrappedValue)
         {
-            Variant = variant;
+            WrappedValue = wrappedValue;
+        }
+        public DataValue(Variant wrappedValue, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
+        {
+            WrappedValue = wrappedValue;
             StatusCode = statusCode;
             SourceTimestamp = sourceTimestamp;
             SourcePicoseconds = sourcePicoseconds;
             ServerTimestamp = serverTimestamp;
             ServerPicoseconds = serverPicoseconds;
         }
-
+        [JsonIgnore]
         public object? Value
         {
-            get { return Variant.Value; }
+            get { return WrappedValue.Value; }
         }
+        [JsonIgnore]
 
         public StatusCode StatusCode { get; }
-
+        [JsonIgnore]
         public DateTime SourceTimestamp { get; }
-
+        [JsonIgnore]
         public ushort SourcePicoseconds { get; }
-
+        [JsonIgnore]
         public DateTime ServerTimestamp { get; }
-
+        [JsonIgnore]
         public ushort ServerPicoseconds { get; }
 
-        public Variant Variant { get; }
+        public Variant WrappedValue { get; }
 
         public override string ToString()
         {
