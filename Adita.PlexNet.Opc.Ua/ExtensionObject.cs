@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 
 namespace Adita.PlexNet.Opc.Ua
@@ -71,6 +72,14 @@ namespace Adita.PlexNet.Opc.Ua
             }
             TypeId = binaryEncodingId;
 
+        }
+
+        [JsonConstructor]
+        public ExtensionObject(object? body, ExpandedNodeId? typeId, BodyType bodyType)
+        {
+            Body = body;
+            TypeId = typeId;
+            BodyType = bodyType;
         }
 
         public object? Body { get; }

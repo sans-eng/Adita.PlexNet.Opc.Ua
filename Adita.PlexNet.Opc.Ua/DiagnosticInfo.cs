@@ -8,7 +8,7 @@ namespace Adita.PlexNet.Opc.Ua
     [DataTypeId(DataTypeIds.DiagnosticInfo)]
     public sealed class DiagnosticInfo
     {
-        public DiagnosticInfo(int namespaceUri = -1, int symbolicId = -1, int locale = -1, int localizedText = -1, string? additionalInfo = null, StatusCode innerStatusCode = default(StatusCode), DiagnosticInfo? innerDiagnosticInfo = null)
+        public DiagnosticInfo(int namespaceUri = -1, int symbolicId = -1, int locale = -1, int localizedText = -1, string? additionalInfo = null, StatusCode innerStatusCode = default, DiagnosticInfo? innerDiagnosticInfo = null)
         {
             NamespaceUri = namespaceUri;
             SymbolicId = symbolicId;

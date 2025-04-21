@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -21,6 +22,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// <param name="localizedText">A localizedText.</param>
         /// <param name="additionalInfo">AdditionalInfo.</param>
         /// <param name="innerResult">An innerResult</param>
+        [JsonConstructor]
         public ServiceResult(StatusCode code, string? symbolicId = null, string? namespaceUri = null, LocalizedText? localizedText = null, string? additionalInfo = null, ServiceResult? innerResult = null)
         {
             StatusCode = code;

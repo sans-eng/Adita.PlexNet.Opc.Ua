@@ -18,11 +18,11 @@ namespace Adita.PlexNet.Opc.Ua
             ServerTimestamp = serverTimestamp;
             ServerPicoseconds = serverPicoseconds;
         }
-        [JsonConstructor]
         public DataValue(Variant wrappedValue)
         {
             WrappedValue = wrappedValue;
         }
+        [JsonConstructor]
         public DataValue(Variant wrappedValue, StatusCode statusCode = default, DateTime sourceTimestamp = default, ushort sourcePicoseconds = 0, DateTime serverTimestamp = default, ushort serverPicoseconds = 0)
         {
             WrappedValue = wrappedValue;
@@ -37,16 +37,11 @@ namespace Adita.PlexNet.Opc.Ua
         {
             get { return WrappedValue.Value; }
         }
-        [JsonIgnore]
 
         public StatusCode StatusCode { get; }
-        [JsonIgnore]
         public DateTime SourceTimestamp { get; }
-        [JsonIgnore]
         public ushort SourcePicoseconds { get; }
-        [JsonIgnore]
         public DateTime ServerTimestamp { get; }
-        [JsonIgnore]
         public ushort ServerPicoseconds { get; }
 
         public Variant WrappedValue { get; }

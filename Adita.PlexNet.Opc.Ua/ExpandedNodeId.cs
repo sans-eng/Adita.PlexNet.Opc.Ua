@@ -5,6 +5,7 @@ using Adita.PlexNet.Opc.Ua.Annotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -40,10 +41,11 @@ namespace Adita.PlexNet.Opc.Ua
             NamespaceUri = namespaceUri;
             ServerIndex = serverIndex;
         }
+        [JsonConstructor]
 
-        public ExpandedNodeId(NodeId identifier, string? namespaceUri = null, uint serverIndex = 0)
+        public ExpandedNodeId(NodeId nodeId, string? namespaceUri = null, uint serverIndex = 0)
         {
-            NodeId = identifier;
+            NodeId = nodeId;
             NamespaceUri = namespaceUri;
             ServerIndex = serverIndex;
         }

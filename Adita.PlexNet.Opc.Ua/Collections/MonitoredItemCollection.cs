@@ -4,7 +4,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Adita.PlexNet.Opc.Ua
+namespace Adita.PlexNet.Opc.Ua.Collections
 {
     /// <summary>
     /// A collection of <see cref="MonitoredItemBase"/>.
