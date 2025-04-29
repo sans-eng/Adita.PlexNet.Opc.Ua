@@ -6936,7 +6936,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.StatusChangeNotification_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.StatusChangeNotification_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.StatusChangeNotification)]
-    public class StatusChangeNotification : NotificationData
+    public class StatusChangeNotification : NotificationData, INotification
     {
         public StatusCode Status { get; set; }
         public DiagnosticInfo? DiagnosticInfo { get; set; }
@@ -6960,7 +6960,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.EventNotificationList_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.EventNotificationList_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.EventNotificationList)]
-    public class EventNotificationList : NotificationData
+    public class EventNotificationList : NotificationData, INotification
     {
         public EventFieldList?[]? Events { get; set; }
         public override void Encode(IEncoder encoder)
@@ -7003,7 +7003,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.DataChangeNotification_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.DataChangeNotification_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.DataChangeNotification)]
-    public class DataChangeNotification : NotificationData
+    public class DataChangeNotification : NotificationData, INotification
     {
         public MonitoredItemNotification?[]? MonitoredItems { get; set; }
         public DiagnosticInfo?[]? DiagnosticInfos { get; set; }

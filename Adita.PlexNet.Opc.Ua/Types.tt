@@ -167,12 +167,24 @@ string RenderBaseTypes(CodeTypeDeclaration type)
     var types = type.BaseTypes;
     var sb = new StringBuilder();
     var flag = false;
+    var isNotificationData = false;
     foreach (var t in types.OfType<CodeTypeReference>())
     {
         sb.Append(!flag ? " : " : ", "); 
         sb.Append(GetShortName(t.BaseType));
         flag = true;
+
+        if(GetShortName(t.BaseType) == "NotificationData")
+        {
+          isNotificationData = true;
+        }
     }
+
+    if(isNotificationData)
+    {
+        sb.Append(", INotification");
+    }
+
     if (flag)
     {
         return sb.ToString();
