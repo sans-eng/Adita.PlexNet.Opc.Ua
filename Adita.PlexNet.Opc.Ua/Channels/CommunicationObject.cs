@@ -24,6 +24,8 @@ namespace Adita.PlexNet.Opc.Ua.Channels
         private readonly SemaphoreSlim _semaphore;
         private readonly Lazy<ConcurrentQueue<Exception>> _exceptions;
 
+        private CommunicationState _state;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CommunicationObject"/> class.
         /// </summary>
@@ -44,12 +46,26 @@ namespace Adita.PlexNet.Opc.Ua.Channels
         public event EventHandler? Opened;
 
         public event EventHandler? Opening;
+        public event EventHandler<CommunicationStateChangedEventArgs>? StateChanged;
 
         /// <summary>
         /// Gets or sets gets a value that indicates the current state of the communication object.
         /// </summary>
         /// <returns>A value from the <see cref="T:Workstation.ServiceModel.Ua.CommunicationState" /> enumeration that indicates the current state of the object.</returns>
-        public CommunicationState State { get; protected set; }
+        public CommunicationState State
+        {
+            get => _state;
+            set
+            {
+                if (_state == value)
+                {
+                    return;
+                }
+
+                _state = value;
+                StateChanged?.Invoke(this, new CommunicationStateChangedEventArgs(value));
+            }
+        }
 
         /// <summary>
         /// Causes a communication object to transition immediately from its current state into the closing state.
