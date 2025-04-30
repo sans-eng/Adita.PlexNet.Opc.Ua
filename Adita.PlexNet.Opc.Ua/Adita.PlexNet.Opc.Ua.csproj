@@ -48,6 +48,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ObjectTypes.tt">
+      <LastGenOutput>ObjectTypes.generated.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="BrowseNames.tt">
+      <LastGenOutput>BrowseNames.generated.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
     <None Update="AttributeIds.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AttributeIds.generated.cs</LastGenOutput>
@@ -74,6 +82,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="ObjectTypes.generated.cs">
+      <DependentUpon>ObjectTypes.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="BrowseNames.generated.cs">
+      <DependentUpon>BrowseNames.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="AttributeIds.generated.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
