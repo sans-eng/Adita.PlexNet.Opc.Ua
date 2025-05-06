@@ -5,6 +5,7 @@ using Adita.PlexNet.Opc.Ua.Abstractions.Decoders;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
 using Adita.PlexNet.Opc.Ua.Abstractions.Encoders;
 using Adita.PlexNet.Opc.Ua.Annotations;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -12,7 +13,7 @@ namespace Adita.PlexNet.Opc.Ua
     /// A base implementation of a Structure.
     /// </summary>
     [DataTypeId(DataTypeIds.Structure)]
-    public abstract class Structure : IEncodable
+    public abstract class Structure : ObservableValidator, IEncodable
     {
         public abstract void Encode(IEncoder encoder);
 
