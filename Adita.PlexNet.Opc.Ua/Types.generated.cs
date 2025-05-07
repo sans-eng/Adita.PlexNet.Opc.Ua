@@ -7027,7 +7027,7 @@ namespace Adita.PlexNet.Opc.Ua
     [BinaryEncodingId(ObjectIds.MonitoredItemNotification_Encoding_DefaultBinary)]
     [XmlEncodingId(ObjectIds.MonitoredItemNotification_Encoding_DefaultXml)]
     [DataTypeId(DataTypeIds.MonitoredItemNotification)]
-    public class MonitoredItemNotification : IEncodable
+    public class MonitoredItemNotification : IEncodable, INotification
     {
         public UInt32 ClientHandle { get; set; }
         public DataValue? Value { get; set; }

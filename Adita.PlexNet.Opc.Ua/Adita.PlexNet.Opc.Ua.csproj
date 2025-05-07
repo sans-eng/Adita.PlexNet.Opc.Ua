@@ -11,11 +11,11 @@
     <Copyright>©2025 Adita</Copyright>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Adds ObservableValidator support for structure datatype</PackageReleaseNotes>
+    <PackageReleaseNotes>Adds INotification impelementation for types that ends with "Notification"</PackageReleaseNotes>
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
     <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 

@@ -8,7 +8,7 @@
 #><#@ import namespace="System.IO" 
 #><#@ import namespace="System.CodeDom" 
 #><#@ import namespace="System.Xml.Schema" 
-#><#@ import namespace="System.Xml.Serialization" 
+#><#@ import namespace="System.Xml.Serialization"
 #><#@ output extension="generated.cs" 
 #><#  
 var filename = this.Host.ResolvePath(@"Schemas\Types.xsd");
@@ -180,15 +180,17 @@ string RenderBaseTypes(CodeTypeDeclaration type)
         }
     }
 
-    if(isNotificationData)
+
+    if(GetShortName(type.Name).EndsWith("Notification"))
     {
-        sb.Append(", INotification");
+        isNotificationData = true;
     }
 
     if (flag)
     {
-        return sb.ToString();
+        return isNotificationData ? $"{sb.ToString()}, INotification" : sb.ToString();
     }
+
     var props = type.Members.OfType<CodeMemberProperty>().ToList(); 
     var isRequest = props.Any(pp=>pp.Name == "RequestHeader");
     if (isRequest)
@@ -202,7 +204,8 @@ string RenderBaseTypes(CodeTypeDeclaration type)
     {
         return " : IServiceResponse";
     }
-    return " : IEncodable";
+
+    return isNotificationData ? $" : IEncodable, INotification" : " : IEncodable" ;
 }
 
 string RenderMethodSuffix(CodeTypeReference type, List<CodeTypeDeclaration> knownEnums) 
