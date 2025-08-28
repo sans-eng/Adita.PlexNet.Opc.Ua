@@ -486,7 +486,7 @@ namespace Adita.PlexNet.Opc.Ua
                     statusCode = StatusCodes.BadServerNotConnected;
                 }
 
-                if (item.TryGetValue(out var value, serverType))
+                if (item is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.TryGetValue(out var value, serverType) && dataValueMonitoredItem.IsValid())
                 {
                     try
                     {

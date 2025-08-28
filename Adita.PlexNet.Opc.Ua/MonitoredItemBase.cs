@@ -2,10 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Adita.PlexNet.Opc.Ua.Abstractions;
+using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Collections;
 using Adita.PlexNet.Opc.Ua.Events;
 using Adita.PlexNet.Opc.Ua.Extensions;
 using Adita.PlexNet.Opc.Ua.Utils;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 
@@ -126,25 +129,24 @@ namespace Adita.PlexNet.Opc.Ua
     /// </summary>
     public class DataValueMonitoredItem : MonitoredItemBase
     {
+        #region Private fields
         private StatusCode statusCode;
+        #endregion Private fields
 
+        #region Constructors
         public DataValueMonitoredItem(object target, PropertyInfo property, ExpandedNodeId nodeId, uint attributeId = 13, string? indexRange = null, MonitoringMode monitoringMode = MonitoringMode.Reporting, int samplingInterval = -1, MonitoringFilter? filter = null, uint queueSize = 0, bool discardOldest = true)
             : base(property.Name, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
+            ArgumentNullException.ThrowIfNull(target);
 
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
+            ArgumentNullException.ThrowIfNull(property);
 
             Target = target;
             Property = property;
         }
+        #endregion Constructors
 
+        #region Public properties
         /// <summary>
         /// Gets the target object.
         /// </summary>
@@ -154,7 +156,9 @@ namespace Adita.PlexNet.Opc.Ua
         /// Gets the property of the target to store the published value.
         /// </summary>
         public PropertyInfo Property { get; }
+        #endregion Public properties
 
+        #region Public methods
         public override void Publish(DataValue dataValue)
         {
             Property.SetValue(Target, dataValue);
@@ -173,7 +177,7 @@ namespace Adita.PlexNet.Opc.Ua
                 value = (DataValue?)pi.GetValue(Target);
                 return true;
             }
-            value = default(DataValue);
+            value = default;
             return false;
         }
 
@@ -187,8 +191,23 @@ namespace Adita.PlexNet.Opc.Ua
         {
             SetDataErrorInfo(statusCode);
         }
+        public virtual IEnumerable<ValidationResult?> Validate()
+        {
+            var validationAttributes = Property.GetCustomAttributes<ValidationAttribute>().Where(attr => attr is not ValidateAttribute);
+            return validationAttributes.Select(attr => {
+                var value = Property.GetValue(Target);
+                return attr.GetValidationResult(value, new ValidationContext(Target));
+            });
+        }
+        public virtual bool IsValid()
+        {
+            var validationResults = Validate();
+            return !validationResults.Any(result => result != ValidationResult.Success);
+        }
+        #endregion Public methods
 
-        private void SetDataErrorInfo(StatusCode statusCode)
+        #region Protected Methods
+        protected void SetDataErrorInfo(StatusCode statusCode)
         {
             if (this.statusCode == statusCode)
             {
@@ -209,51 +228,27 @@ namespace Adita.PlexNet.Opc.Ua
                 }
             }
         }
+        #endregion Protected Methods
     }
 
     /// <summary>
     /// Subscribes to data changes of an attribute of a node.
     /// Unwraps the published value and sets it in a property.
     /// </summary>
-    public class ValueMonitoredItem : MonitoredItemBase
+    public class ValueMonitoredItem : DataValueMonitoredItem
     {
-        private StatusCode statusCode;
-
         public ValueMonitoredItem(object target, PropertyInfo property, ExpandedNodeId nodeId, uint attributeId = 13, string? indexRange = null, MonitoringMode monitoringMode = MonitoringMode.Reporting, int samplingInterval = -1, MonitoringFilter? filter = null, uint queueSize = 0, bool discardOldest = true)
-            : base(property.Name, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
+            : base(target, property, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
+            ArgumentNullException.ThrowIfNull(target);
 
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-
-            Target = target;
-            Property = property;
+            ArgumentNullException.ThrowIfNull(property);
         }
-
-        /// <summary>
-        /// Gets the target object.
-        /// </summary>
-        public object Target { get; }
-
-        /// <summary>
-        /// Gets the property of the target to store the published value.
-        /// </summary>
-        public PropertyInfo Property { get; }
 
         public override void Publish(DataValue dataValue)
         {
             Property.SetValue(Target, dataValue.GetValue());
             SetDataErrorInfo(dataValue.StatusCode);
-        }
-
-        public override void Publish(Variant[] eventFields)
-        {
         }
 
         public override bool TryGetValue(out DataValue? value, Type? serverType = default)
@@ -264,41 +259,8 @@ namespace Adita.PlexNet.Opc.Ua
                 value = new DataValue(Property.GetValue(Target));
                 return true;
             }
-            value = default(DataValue);
+            value = default;
             return false;
-        }
-
-        public override void OnCreateResult(MonitoredItemCreateResult result)
-        {
-            ServerId = result.MonitoredItemId;
-            SetDataErrorInfo(result.StatusCode);
-        }
-
-        public override void OnWriteResult(StatusCode statusCode)
-        {
-            SetDataErrorInfo(statusCode);
-        }
-
-        private void SetDataErrorInfo(StatusCode statusCode)
-        {
-            if (this.statusCode == statusCode)
-            {
-                return;
-            }
-
-            this.statusCode = statusCode;
-
-            if (Target is ISetDataErrorInfo targetAsDataErrorInfo)
-            {
-                if (!StatusCode.IsGood(statusCode))
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, [StatusCodes.GetDefaultMessage(statusCode)]);
-                }
-                else
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, null);
-                }
-            }
         }
     }
 
@@ -306,36 +268,15 @@ namespace Adita.PlexNet.Opc.Ua
     /// Subscribes to data changes of an attribute of a node.
     /// Enqueues the published value to an <see cref="ObservableQueue{DataValue}"/>.
     /// </summary>
-    public class DataValueQueueMonitoredItem : MonitoredItemBase
+    public class DataValueQueueMonitoredItem : DataValueMonitoredItem
     {
-        private StatusCode statusCode;
-
         public DataValueQueueMonitoredItem(object target, PropertyInfo property, ExpandedNodeId nodeId, uint attributeId = 13, string? indexRange = null, MonitoringMode monitoringMode = MonitoringMode.Reporting, int samplingInterval = -1, MonitoringFilter? filter = null, uint queueSize = 0, bool discardOldest = true)
-            : base(property.Name, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
+             : base(target, property, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
+            ArgumentNullException.ThrowIfNull(target);
 
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-
-            Target = target;
-            Property = property;
+            ArgumentNullException.ThrowIfNull(property);
         }
-
-        /// <summary>
-        /// Gets the target object.
-        /// </summary>
-        public object Target { get; }
-
-        /// <summary>
-        /// Gets the property of the target to store the published value.
-        /// </summary>
-        public PropertyInfo Property { get; }
 
         public override void Publish(DataValue dataValue)
         {
@@ -343,84 +284,28 @@ namespace Adita.PlexNet.Opc.Ua
             queue.Enqueue(dataValue);
         }
 
-        public override void Publish(Variant[] eventFields)
-        {
-        }
-
         public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
-            value = default(DataValue);
+            value = default;
             return false;
-        }
-
-        public override void OnCreateResult(MonitoredItemCreateResult result)
-        {
-            ServerId = result.MonitoredItemId;
-            SetDataErrorInfo(result.StatusCode);
-        }
-
-        public override void OnWriteResult(StatusCode statusCode)
-        {
-            SetDataErrorInfo(statusCode);
-        }
-
-        private void SetDataErrorInfo(StatusCode statusCode)
-        {
-            if (this.statusCode == statusCode)
-            {
-                return;
-            }
-
-            this.statusCode = statusCode;
-
-            if (Target is ISetDataErrorInfo targetAsDataErrorInfo)
-            {
-                if (!StatusCode.IsGood(statusCode))
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, [StatusCodes.GetDefaultMessage(statusCode)]);
-                }
-                else
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, null);
-                }
-            }
-        }
+        }     
     }
 
     /// <summary>
     /// Subscribes to data changes of an attribute of a node.
     /// Unwraps the published value and sets it in a property.
     /// </summary>
-    public class ValueMonitoredItem<T> : MonitoredItemBase
+    public class ValueMonitoredItem<T> : DataValueMonitoredItem
     {
         private StatusCode statusCode;
 
         public ValueMonitoredItem(object target, PropertyInfo property, ExpandedNodeId nodeId, uint attributeId = 13, string? indexRange = null, MonitoringMode monitoringMode = MonitoringMode.Reporting, int samplingInterval = -1, MonitoringFilter? filter = null, uint queueSize = 0, bool discardOldest = true)
-            : base(property.Name, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
+             : base(target, property, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
+            ArgumentNullException.ThrowIfNull(target);
 
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-
-            Target = target;
-            Property = property;
+            ArgumentNullException.ThrowIfNull(property);
         }
-
-        /// <summary>
-        /// Gets the target object.
-        /// </summary>
-        public object Target { get; }
-
-        /// <summary>
-        /// Gets the property of the target to store the published value.
-        /// </summary>
-        public PropertyInfo Property { get; }
 
         public override void Publish(DataValue dataValue)
         {
@@ -428,10 +313,6 @@ namespace Adita.PlexNet.Opc.Ua
 
             Property.SetValue(Target, value);
             SetDataErrorInfo(dataValue.StatusCode);
-        }
-
-        public override void Publish(Variant[] eventFields)
-        {
         }
 
         public override bool TryGetValue(out DataValue? value, Type? serverType = default)
@@ -454,39 +335,6 @@ namespace Adita.PlexNet.Opc.Ua
             }
             value = default(DataValue);
             return false;
-        }
-
-        public override void OnCreateResult(MonitoredItemCreateResult result)
-        {
-            ServerId = result.MonitoredItemId;
-            SetDataErrorInfo(result.StatusCode);
-        }
-
-        public override void OnWriteResult(StatusCode statusCode)
-        {
-            SetDataErrorInfo(statusCode);
-        }
-
-        private void SetDataErrorInfo(StatusCode statusCode)
-        {
-            if (this.statusCode == statusCode)
-            {
-                return;
-            }
-
-            this.statusCode = statusCode;
-
-            if (Target is ISetDataErrorInfo targetAsDataErrorInfo)
-            {
-                if (!StatusCode.IsGood(statusCode))
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, [StatusCodes.GetDefaultMessage(statusCode)]);
-                }
-                else
-                {
-                    targetAsDataErrorInfo.SetErrors(Property.Name, null);
-                }
-            }
         }
     }
 
