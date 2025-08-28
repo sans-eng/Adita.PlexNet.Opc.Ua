@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adita.PlexNet.Opc.Ua.Sample", "Adita.PlexNet.Opc.Ua.Sample\Adita.PlexNet.Opc.Ua.Sample.csproj", "{CD57114B-1748-DA39-88AD-66B37498C97C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adita.PlexNet.Opc.Ua.Sample.Core", "Adita.PlexNet.Opc.Ua.Sample.Core\Adita.PlexNet.Opc.Ua.Sample.Core.csproj", "{F325E842-FA47-A7A9-787F-B797825E1FC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,21 @@ Global
 		{5FDCF462-3701-4B40-AB10-4B642400D8FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FDCF462-3701-4B40-AB10-4B642400D8FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FDCF462-3701-4B40-AB10-4B642400D8FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Debug|Any CPU.Build.0 = Debug|x64
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Debug|Any CPU.Deploy.0 = Debug|x64
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Release|Any CPU.ActiveCfg = Release|x64
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Release|Any CPU.Build.0 = Release|x64
+		{CD57114B-1748-DA39-88AD-66B37498C97C}.Release|Any CPU.Deploy.0 = Release|x64
+		{F325E842-FA47-A7A9-787F-B797825E1FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F325E842-FA47-A7A9-787F-B797825E1FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F325E842-FA47-A7A9-787F-B797825E1FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F325E842-FA47-A7A9-787F-B797825E1FC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5D6ACDEE-964C-4963-8E8E-9467532305F1}
 	EndGlobalSection
 EndGlobal
