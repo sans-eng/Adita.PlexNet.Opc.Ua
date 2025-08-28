@@ -11,7 +11,7 @@
     <Copyright>©2025 Adita</Copyright>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Adds INotification impelementation for types that ends with "Notification"</PackageReleaseNotes>
+    <PackageReleaseNotes>Add supports for validation before write to server</PackageReleaseNotes>
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
     <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
