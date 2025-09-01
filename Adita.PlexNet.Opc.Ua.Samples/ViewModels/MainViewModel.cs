@@ -1,6 +1,7 @@
-﻿using Adita.PlexNet.ComponentModel.DataAnnotations.DataAnnotations;
-using Adita.PlexNet.Opc.Ua.Annotations;
+﻿using Adita.PlexNet.Opc.Ua.Annotations;
+using Adita.PlexNet.Opc.Ua.Samples.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Adita.PlexNet.Opc.Ua.Samples.ViewModels;
 
@@ -8,17 +9,17 @@ namespace Adita.PlexNet.Opc.Ua.Samples.ViewModels;
 public partial class MainViewModel : SubscriptionBase
 {
     [ObservableProperty]
-    [MonitoredItem("ns=4;s=|var|CODESYS Control Win V3 x64.Application.gMain.lrValue")]
-    [Validate]
-    [CompareRange(nameof(MinValue), nameof(MaxValue))]
-    [NotifyDataErrorInfo]
-    private double _value;
-    [ObservableProperty]
-    private double _minValue;
-    [ObservableProperty]
-    private double _maxValue = 20;
+    [MonitoredItem("ns=4;s=|var|c500.Application.gMain.stTestModel")]
+    private TestModel _testModel;
     public MainViewModel()
     {
+
+    }
+
+    [RelayCommand]
+    public async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
     }
 }
 

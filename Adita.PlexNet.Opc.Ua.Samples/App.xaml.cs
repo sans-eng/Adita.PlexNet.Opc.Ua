@@ -11,6 +11,7 @@ using Adita.PlexNet.Opc.Ua.Samples.ViewModels;
 using Adita.PlexNet.Opc.Ua.Samples.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 
 namespace Adita.PlexNet.Opc.Ua.Samples;
@@ -81,16 +82,32 @@ public partial class App : Application
 
         UnhandledException += App_UnhandledException;
 
+        //var uaApp = new UaApplicationBuilder()
+        //   .SetApplicationUri("urn:WeQ-Adi:Weq.Test")
+        //   .SetDirectoryStore("C:\\ProgramData\\Weq.Test\\pki")
+        //   .SetIdentity(new UserNameIdentity("weq-adi", "admin"))
+        //   .AddMappedEndpoint("Main", new EndpointDescription()
+        //   {
+        //       EndpointUrl = "opc.tcp://WeQ-Adi:4840",
+        //       SecurityMode = MessageSecurityMode.SignAndEncrypt,
+        //       SecurityPolicyUri = SecurityPolicyUris.Basic256Sha256
+        //   }).Build();
+
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddDebug());
+        var serviceProvider = services.BuildServiceProvider();
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var uaApp = new UaApplicationBuilder()
-           .SetApplicationUri("urn:WeQ-Adi:Weq.Test")
-           .SetDirectoryStore("C:\\ProgramData\\Weq.Test\\pki")
-           .SetIdentity(new UserNameIdentity("weq-adi", "admin"))
-           .AddMappedEndpoint("Main", new EndpointDescription()
-           {
-               EndpointUrl = "opc.tcp://WeQ-Adi:4840",
-               SecurityMode = MessageSecurityMode.SignAndEncrypt,
-               SecurityPolicyUri = SecurityPolicyUris.Basic256Sha256
-           }).Build();
+         .SetApplicationUri("urn:WeQ-Adi:Weq.Test")
+         .SetDirectoryStore("C:\\ProgramData\\Weq.Test\\pki")
+         .SetIdentity(new AnonymousIdentity())
+         .SetLoggerFactory(loggerFactory)
+         .AddMappedEndpoint("Main", new EndpointDescription()
+         {
+             EndpointUrl = "opc.tcp://192.168.5.99:4840",
+             SecurityMode = MessageSecurityMode.None,
+             SecurityPolicyUri = SecurityPolicyUris.None
+         }).Build();
         uaApp.Run();
     }
 

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks.Dataflow;
 
@@ -31,6 +32,8 @@ namespace Adita.PlexNet.Opc.Ua
 
         #region Private fields
         private bool _disposed;
+
+        private readonly List<StructureMonitoredItemDescriptor> _structureMonitoredItemDescriptors = [];
 
         private readonly ActionBlock<PublishResponse> _actionBlock;
         private readonly IProgress<CommunicationState> _progress;
@@ -190,6 +193,7 @@ namespace Adita.PlexNet.Opc.Ua
 
             }
 
+            RegisterStructureMonitoredItems(_monitoredItems);
             _stateMachineCts = new CancellationTokenSource();
             _stateMachineTask = Task.Run(() => StateMachineAsync(_stateMachineCts.Token));
         }
@@ -333,6 +337,8 @@ namespace Adita.PlexNet.Opc.Ua
                         throw;
                     }
                 }
+
+                UnregisterStructureMonitoredItems(_monitoredItems);
                 _disposed = true;
             }
         }
@@ -356,6 +362,18 @@ namespace Adita.PlexNet.Opc.Ua
         #endregion Internal methods
 
         #region Private Methods
+        private void RegisterStructureMonitoredItems(MonitoredItemBaseCollection monitoredItems)
+        {
+            var structureMonitoredItems = _monitoredItems.Where(m => m is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.Property.PropertyType.IsAssignableTo(typeof(Structure)))
+                .Cast<DataValueMonitoredItem>()
+                .Select(m => new StructureMonitoredItemDescriptor(this, m.Property));
+            _structureMonitoredItemDescriptors.AddRange(structureMonitoredItems);
+        }
+        private void UnregisterStructureMonitoredItems(MonitoredItemBaseCollection monitoredItems)
+        {
+            _structureMonitoredItemDescriptors.ForEach(m => m.Dispose());
+            _structureMonitoredItemDescriptors.Clear();
+        }
         /// <summary>
         /// Handle PublishResponse message.
         /// </summary>
@@ -709,6 +727,9 @@ namespace Adita.PlexNet.Opc.Ua
         }
         #endregion Private Methods
 
+        #region Event handlers
+        #endregion Event handlers
+
         private class MonitoredItemPropertyInfoDescriptor
         {
             #region Constructors
@@ -729,6 +750,63 @@ namespace Adita.PlexNet.Opc.Ua
                 get; set;
             }
             #endregion Public properties
+        }
+
+        private class StructureMonitoredItemDescriptor : IDisposable
+        {
+            #region Constructors
+            public StructureMonitoredItemDescriptor(SubscriptionBase target, PropertyInfo propertyInfo)
+            {
+                Target = target;
+                PropertyInfo = propertyInfo;
+
+                Target.PropertyChanged += OnTargetPropertyChanged;
+
+                if (Value != null)
+                {
+                    Value.PropertyChanged += OnValuePropertyChanged;
+                }
+            }
+
+            private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == PropertyInfo.Name && Value != null)
+                {
+                    Value.PropertyChanged += OnValuePropertyChanged;
+                }
+            }
+            #endregion Constructors
+
+            #region Public properties
+            public SubscriptionBase Target
+            {
+                get;
+            }
+            public PropertyInfo PropertyInfo
+            {
+                get;
+            }
+            public Structure? Value => PropertyInfo.CanRead ? PropertyInfo.GetValue(Target) as Structure : default;
+            #endregion Public properties
+
+            #region Public methods
+            public void Dispose()
+            {
+                if (Value != null)
+                {
+                    Value.PropertyChanged -= OnValuePropertyChanged;
+                }
+
+                Target.PropertyChanged -= OnTargetPropertyChanged;
+            }
+            #endregion Public methods
+
+            #region Event handlers
+            private void OnValuePropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                Target.OnPropertyChanged(Target, new(PropertyInfo.Name));
+            }
+            #endregion Event handlers
         }
     }
 }
