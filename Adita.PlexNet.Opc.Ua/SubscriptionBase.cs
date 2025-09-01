@@ -12,6 +12,7 @@ using Adita.PlexNet.Opc.Ua.Internal.Extensions;
 using Adita.PlexNet.Opc.Ua.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -24,6 +25,10 @@ namespace Adita.PlexNet.Opc.Ua
     /// </summary>
     public abstract partial class SubscriptionBase : ObservableValidator, ISetDataErrorInfo, IAsyncDisposable
     {
+        #region Caching fields
+        private static readonly ConcurrentDictionary<Type, IReadOnlyList<MonitoredItemPropertyInfoDescriptor>> _cachedMonitoredItemPropertyInfoDescriptors = [];
+        #endregion Caching fields
+
         #region Private fields
         private bool _disposed;
 
@@ -45,7 +50,7 @@ namespace Adita.PlexNet.Opc.Ua
         private readonly CancellationTokenSource _stateMachineCts;
         private readonly Task _stateMachineTask;
 
-        private readonly Dictionary<string, List<string>> _errors = new();
+        private readonly Dictionary<string, List<string>> _errors = [];
         #endregion Private fields
 
         #region Constructors
@@ -91,22 +96,7 @@ namespace Adita.PlexNet.Opc.Ua
             }
 
             // read [MonitoredItem] attributes.
-            var monitoredItemProperyInfoDescriptors = typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(p => p.GetCustomAttribute<MonitoredItemAttribute>() != null)
-                .Select(pi => new MonitoredItemPropertyInfoDescriptor(pi, pi.GetCustomAttribute<MonitoredItemAttribute>()!)).ToList();
-
-            var monitoredItemFieldInfos = typeInfo.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Where(p => p.GetCustomAttribute<MonitoredItemAttribute>() != null)
-                .Select(fi => new { FieldInfo = fi, Attribute = fi.GetCustomAttribute<MonitoredItemAttribute>()! });
-
-            if (monitoredItemFieldInfos.Any())
-            {
-                var foundPropertyInfos = monitoredItemFieldInfos
-                    .Where(fi => typeInfo.GetProperty(fi.FieldInfo.Name.ToPascalCase()) != null)
-                    .Select(fi => new MonitoredItemPropertyInfoDescriptor(typeInfo.GetProperty(fi.FieldInfo.Name.ToPascalCase())!, fi.Attribute));
-
-                monitoredItemProperyInfoDescriptors.AddRange(foundPropertyInfos);
-            }
+            var monitoredItemProperyInfoDescriptors = GetMonitoredItemPropertyInfoDescriptors(typeInfo);
 
             foreach (var monitoredItemProperyInfoDescriptor in monitoredItemProperyInfoDescriptors)
             {
@@ -211,8 +201,8 @@ namespace Adita.PlexNet.Opc.Ua
         /// </summary>
         public CommunicationState State
         {
-            get { return _state; }
-            private set { SetProperty(ref _state, value); }
+            get => _state;
+            private set => SetProperty(ref _state, value);
         }
 
         /// <summary>
@@ -590,10 +580,10 @@ namespace Adita.PlexNet.Opc.Ua
                                 var requests = items.Select(m => new MonitoredItemCreateRequest { ItemToMonitor = new ReadValueId { NodeId = ExpandedNodeId.ToNodeId(m.NodeId, InnerChannel.NamespaceUris), AttributeId = m.AttributeId, IndexRange = m.IndexRange }, MonitoringMode = m.MonitoringMode, RequestedParameters = new MonitoringParameters { ClientHandle = m.ClientId, DiscardOldest = m.DiscardOldest, QueueSize = m.QueueSize, SamplingInterval = m.SamplingInterval, Filter = m.Filter } }).ToArray();
 
                                 //split requests array to MaxMonitoredItemsPerCall chunks
-                                int maxmonitoreditemspercall = 100;
+                                var maxmonitoreditemspercall = 100;
                                 MonitoredItemCreateRequest[] requests_chunk;
                                 int chunk_size;
-                                for (int i_chunk = 0; i_chunk < requests.Length; i_chunk += maxmonitoreditemspercall)
+                                for (var i_chunk = 0; i_chunk < requests.Length; i_chunk += maxmonitoreditemspercall)
                                 {
                                     chunk_size = Math.Min(maxmonitoreditemspercall, requests.Length - i_chunk);
                                     requests_chunk = new MonitoredItemCreateRequest[chunk_size];
@@ -608,7 +598,7 @@ namespace Adita.PlexNet.Opc.Ua
 
                                     if (itemsResponse.Results is { } results)
                                     {
-                                        for (int i = 0; i < results.Length; i++)
+                                        for (var i = 0; i < results.Length; i++)
                                         {
                                             var item = items[i];
                                             var result = results[i];
@@ -692,6 +682,31 @@ namespace Adita.PlexNet.Opc.Ua
                 }
             }
         }
+
+        private IReadOnlyList<MonitoredItemPropertyInfoDescriptor> GetMonitoredItemPropertyInfoDescriptors(Type type)
+        {
+            return _cachedMonitoredItemPropertyInfoDescriptors.GetOrAdd(type, t =>
+            {
+                var monitoredItemProperyInfoDescriptors = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                 .Where(p => p.GetCustomAttribute<MonitoredItemAttribute>() != null)
+                 .Select(pi => new MonitoredItemPropertyInfoDescriptor(pi, pi.GetCustomAttribute<MonitoredItemAttribute>()!)).ToList();
+
+                var monitoredItemFieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                    .Where(p => p.GetCustomAttribute<MonitoredItemAttribute>() != null)
+                    .Select(fi => new { FieldInfo = fi, Attribute = fi.GetCustomAttribute<MonitoredItemAttribute>()! });
+
+                if (monitoredItemFieldInfos.Any())
+                {
+                    var foundPropertyInfos = monitoredItemFieldInfos
+                        .Where(fi => type.GetProperty(fi.FieldInfo.Name.ToPascalCase()) != null)
+                        .Select(fi => new MonitoredItemPropertyInfoDescriptor(type.GetProperty(fi.FieldInfo.Name.ToPascalCase())!, fi.Attribute));
+
+                    monitoredItemProperyInfoDescriptors.AddRange(foundPropertyInfos);
+                }
+
+                return monitoredItemProperyInfoDescriptors;
+            });
+        }
         #endregion Private Methods
 
         private class MonitoredItemPropertyInfoDescriptor
@@ -705,8 +720,14 @@ namespace Adita.PlexNet.Opc.Ua
             #endregion Constructors
 
             #region Public properties
-            public PropertyInfo PropertyInfo { get; set; }
-            public MonitoredItemAttribute MonitoredItemAttribute { get; set; }
+            public PropertyInfo PropertyInfo
+            {
+                get; set;
+            }
+            public MonitoredItemAttribute MonitoredItemAttribute
+            {
+                get; set;
+            }
             #endregion Public properties
         }
     }
