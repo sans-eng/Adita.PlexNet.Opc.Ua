@@ -42,7 +42,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// <param name="request">a request.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.4.2/">OPC UA specification Part 4: Services, 5.4.2</seealso>
-        public static async Task<FindServersResponse> FindServersAsync(FindServersRequest request, ILoggerFactory? loggerFactory = null, UaApplicationOptions? options = null, StackProfile? stackProfile = null)
+        public static async Task<FindServersResponse> FindServersAsync(FindServersRequest request, ILoggerFactory? loggerFactory = null, ClientSecureChannelOptions? options = null, StackProfile? stackProfile = null)
         {
             if (request == null)
             {
@@ -81,7 +81,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// <param name="options">The secure channel options.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.4.4/">OPC UA specification Part 4: Services, 5.4.4</seealso>
-        public static async Task<GetEndpointsResponse> GetEndpointsAsync(GetEndpointsRequest request, ILoggerFactory? loggerFactory = null, UaApplicationOptions? options = null, StackProfile? stackProfile = null)
+        public static async Task<GetEndpointsResponse> GetEndpointsAsync(GetEndpointsRequest request, ILoggerFactory? loggerFactory = null, ClientSecureChannelOptions? options = null, StackProfile? stackProfile = null)
         {
             if (request == null)
             {

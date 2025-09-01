@@ -8,8 +8,20 @@ namespace Adita.PlexNet.Opc.Ua.Options
     /// <summary>
     /// The UaApplication options.
     /// </summary>
-    public class UaApplicationOptions : ClientSessionChannelOptions
+    public class UaApplicationOptions
     {
+        #region Public Properties
+        public ServerCapabilitiesOptions ServerCapabilities
+        {
+            get;
+            set;
+        }
+        public ClientSessionChannelOptions ClientSessionChannel
+        {
+            get;
+            set;
+        }
+        #endregion Public Properties
     }
 
     /// <summary>

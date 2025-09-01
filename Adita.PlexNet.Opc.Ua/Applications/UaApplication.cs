@@ -243,7 +243,7 @@ namespace Adita.PlexNet.Opc.Ua.Applications
                     UserIdentityProvider,
                     endpoint,
                     LoggerFactory,
-                    Options);
+                    Options.ClientSessionChannel);
 
                 channel.Faulted += (s, e) =>
                 {
