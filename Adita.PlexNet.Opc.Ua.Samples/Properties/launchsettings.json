@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "Adita.PlexNet.Opc.Ua.Samples (Unpackaged)": {
+        "commandName": "Project"
+      },
+      "Adita.PlexNet.Opc.Ua.Samples (Package)": {
+        "commandName": "MsixPackage"
+      }
+    }
+}
