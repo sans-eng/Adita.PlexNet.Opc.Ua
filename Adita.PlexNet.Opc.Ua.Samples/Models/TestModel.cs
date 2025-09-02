@@ -14,6 +14,8 @@ public partial class TestModel : Structure
     [ObservableProperty]
     private double _value;
 
+    public override bool IsDefault => Value == default;
+
     public override void Decode(IDecoder decoder)
     {
         decoder.PushNamespace("urn:Lenze:PLCOpen");

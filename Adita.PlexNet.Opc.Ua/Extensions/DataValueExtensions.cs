@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Adita.PlexNet.Opc.Ua.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using Adita.PlexNet.Opc.Ua.Extensions;
 
 namespace Adita.PlexNet.Opc.Ua.Extensions
 {
@@ -59,20 +59,44 @@ namespace Adita.PlexNet.Opc.Ua.Extensions
 
                 case ExtensionObject[] objArray:
                     // handle object[], custom type[]
-                    var v3 = objArray.Select(e => e.BodyType == BodyType.Encodable ? e.Body : e);
-                    var elementType = typeof(T).GetElementType();
-                    if (elementType == null)
+                    var arrayObject = objArray.Select(e => e.BodyType == BodyType.Encodable ? e.Body : e);
+                    if (typeof(T).IsAbstract || typeof(T).IsInterface)
+                    {
+                        return default;
+                    }
+                    var argumentTypes = typeof(T).GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))?.GetGenericArguments();
+                    var argumentType = argumentTypes?.Length > 0 ? argumentTypes[0] : null;
+                    if (argumentType == null)
                     {
                         return default!;
                     }
+
                     try
                     {
-                        var v4 = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(elementType).Invoke(null, new object?[] { v3 });
-                        var v5 = typeof(Enumerable).GetMethod("ToArray")!.MakeGenericMethod(elementType).Invoke(null, new object?[] { v4 });
-                        if (v5 is T t2)
+                        var castedInstances = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(argumentType).Invoke(null, [arrayObject]);
+                        if (typeof(T).IsArray)
                         {
-                            return t2;
+                            var arrayInstance = typeof(Enumerable).GetMethod("ToArray")!.MakeGenericMethod(argumentType).Invoke(null, [castedInstances]);
+                            if (arrayInstance is T arrayValue)
+                            {
+                                return arrayValue;
+                            }
                         }
+                        else
+                        {
+                            if (castedInstances is IEnumerable<Structure> structures)
+                            {
+                                var filtered = structures.Where(s => !s.IsDefault);
+                                castedInstances = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(argumentType).Invoke(null, [filtered]);
+                            }
+
+                            var collection = Activator.CreateInstance(typeof(T), castedInstances);
+                            if (collection is T collectionResult)
+                            {
+                                return collectionResult;
+                            }
+                        }
+
                         return default!;
                     }
                     catch (Exception)
@@ -90,7 +114,7 @@ namespace Adita.PlexNet.Opc.Ua.Extensions
                     {
                         return t;
                     }
-                    return default!;
+                        return default!;
             }
         }
 

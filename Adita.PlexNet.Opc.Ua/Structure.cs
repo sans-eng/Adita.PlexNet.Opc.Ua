@@ -15,6 +15,11 @@ namespace Adita.PlexNet.Opc.Ua
     [DataTypeId(DataTypeIds.Structure)]
     public abstract class Structure : ObservableValidator, IEncodable
     {
+        public virtual bool IsDefault
+        {
+            get;
+        }
+
         public abstract void Encode(IEncoder encoder);
 
         public abstract void Decode(IDecoder decoder);
