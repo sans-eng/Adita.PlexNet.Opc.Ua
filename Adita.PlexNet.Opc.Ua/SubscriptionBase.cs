@@ -727,9 +727,6 @@ namespace Adita.PlexNet.Opc.Ua
         }
         #endregion Private Methods
 
-        #region Event handlers
-        #endregion Event handlers
-
         private class MonitoredItemPropertyInfoDescriptor
         {
             #region Constructors
