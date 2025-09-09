@@ -338,7 +338,7 @@ namespace Adita.PlexNet.Opc.Ua
                     }
                 }
 
-                UnregisterStructureMonitoredItems(_monitoredItems);
+                UnregisterStructureMonitoredItems();
                 _disposed = true;
             }
         }
@@ -364,12 +364,12 @@ namespace Adita.PlexNet.Opc.Ua
         #region Private Methods
         private void RegisterStructureMonitoredItems(MonitoredItemBaseCollection monitoredItems)
         {
-            var structureMonitoredItems = _monitoredItems.Where(m => m is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.Property.PropertyType.IsAssignableTo(typeof(Structure)))
+            var structureMonitoredItems = monitoredItems.Where(m => m is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.Property.PropertyType.IsAssignableTo(typeof(Structure)))
                 .Cast<DataValueMonitoredItem>()
                 .Select(m => new StructureMonitoredItemDescriptor(this, m.Property));
             _structureMonitoredItemDescriptors.AddRange(structureMonitoredItems);
         }
-        private void UnregisterStructureMonitoredItems(MonitoredItemBaseCollection monitoredItems)
+        private void UnregisterStructureMonitoredItems()
         {
             _structureMonitoredItemDescriptors.ForEach(m => m.Dispose());
             _structureMonitoredItemDescriptors.Clear();
@@ -754,22 +754,14 @@ namespace Adita.PlexNet.Opc.Ua
             #region Constructors
             public StructureMonitoredItemDescriptor(SubscriptionBase target, PropertyInfo propertyInfo)
             {
-                Target = target;
-                PropertyInfo = propertyInfo;
+                Target = target ?? throw new ArgumentNullException(nameof(target));
+                PropertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
 
                 Target.PropertyChanged += OnTargetPropertyChanged;
 
                 if (Value != null)
                 {
-                    Value.PropertyChanged += OnValuePropertyChanged;
-                }
-            }
-
-            private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == PropertyInfo.Name && Value != null)
-                {
-                    Value.PropertyChanged += OnValuePropertyChanged;
+                    Value.ValueChanged += OnValueChanged;
                 }
             }
             #endregion Constructors
@@ -791,7 +783,7 @@ namespace Adita.PlexNet.Opc.Ua
             {
                 if (Value != null)
                 {
-                    Value.PropertyChanged -= OnValuePropertyChanged;
+                    Value.ValueChanged -= OnValueChanged;
                 }
 
                 Target.PropertyChanged -= OnTargetPropertyChanged;
@@ -799,7 +791,14 @@ namespace Adita.PlexNet.Opc.Ua
             #endregion Public methods
 
             #region Event handlers
-            private void OnValuePropertyChanged(object? sender, PropertyChangedEventArgs e)
+            private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == PropertyInfo.Name && Value != null)
+                {
+                    Value.ValueChanged += OnValueChanged;
+                }
+            }
+            private void OnValueChanged(object? sender, EventArgs e)
             {
                 Target.OnPropertyChanged(Target, new(PropertyInfo.Name));
             }
