@@ -15,6 +15,7 @@ xmlns:ic="using:Microsoft.Xaml.Interactions.Core">
     <Grid x:Name="ContentArea">
         <StackPanel>
             <NumberBox Value="{x:Bind ViewModel.Value, Mode=TwoWay}"/>
+            <NumberBox Value="{x:Bind ViewModel.Value1, Mode=TwoWay}"/>
             <TextBlock Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}" Text="HasError"/>
         </StackPanel>
     </Grid>
