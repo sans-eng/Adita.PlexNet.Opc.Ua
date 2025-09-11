@@ -55,11 +55,31 @@ namespace Adita.PlexNet.Opc.Ua
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
         /// <inheritdoc/>
+        protected override void OnPropertyChanging(PropertyChangingEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName) && GetType().GetProperty(e.PropertyName)?.GetValue(this) is Structure propertyValue)
+            {
+                propertyValue.ValueChanged -= OnChildStructureValueChanged;
+            }
+            base.OnPropertyChanging(e);
+        }
+        /// <inheritdoc/>
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             OnValueChanged();
+            if (!string.IsNullOrEmpty(e.PropertyName) && GetType().GetProperty(e.PropertyName)?.GetValue(this) is Structure propertyValue)
+            {
+                propertyValue.ValueChanged += OnChildStructureValueChanged;
+            }
             base.OnPropertyChanged(e);
         }
         #endregion Protected methods
+
+        #region Event handlers
+        private void OnChildStructureValueChanged(object? sender, EventArgs e)
+        {
+            OnValueChanged();
+        }
+        #endregion Event handlers
     }
 }

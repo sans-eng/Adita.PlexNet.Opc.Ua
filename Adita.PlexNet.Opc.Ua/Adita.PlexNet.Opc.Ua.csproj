@@ -11,11 +11,11 @@
     <Copyright>©2025 Adita</Copyright>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Add support for invoking structure value changed manually</PackageReleaseNotes>
+    <PackageReleaseNotes>Chaining child structure value changed to parent</PackageReleaseNotes>
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
     <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.10.0</Version>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <Version>1.11.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 

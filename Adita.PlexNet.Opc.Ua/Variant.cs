@@ -3,6 +3,7 @@
 
 using Adita.PlexNet.Opc.Ua.Abstractions.Encodables;
 using Adita.PlexNet.Opc.Ua.Annotations;
+using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -124,7 +125,7 @@ namespace Adita.PlexNet.Opc.Ua
                 return;
             }
 
-            Type type = value.GetType();
+            var type = value.GetType();
             VariantType variantType;
             if (typeMap.TryGetValue(type, out variantType))
             {
@@ -134,18 +135,26 @@ namespace Adita.PlexNet.Opc.Ua
                 return;
             }
 
-            var encodable = value as IEncodable;
-            if (encodable != null)
+            if (value is IEncodable)
             {
-                Value = new ExtensionObject(encodable);
+                Value = new ExtensionObject(value as IEncodable);
                 Type = VariantType.ExtensionObject;
                 ArrayDimensions = null;
                 return;
             }
 
+
+            var genericArgumentType = value.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))?.GenericTypeArguments.FirstOrDefault();
+
+            if (genericArgumentType?.IsAssignableTo(typeof(IEncodable)) == true)
+            {
+                var castedInstances = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(genericArgumentType).Invoke(null, [value]);
+                value = typeof(Enumerable).GetMethod("ToArray")!.MakeGenericMethod(genericArgumentType).Invoke(null, [castedInstances]);
+            }
+
             if (value is Array array)
             {
-                Type? elemType = array.GetType().GetElementType();
+                var elemType = array.GetType().GetElementType();
                 if (elemType == null)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value), elemType, "Array element Type is unsupported.");
@@ -156,7 +165,7 @@ namespace Adita.PlexNet.Opc.Ua
                     Value = array;
                     Type = variantType;
                     ArrayDimensions = new int[array.Rank];
-                    for (int i = 0; i < array.Rank; i++)
+                    for (var i = 0; i < array.Rank; i++)
                     {
                         ArrayDimensions[i] = array.GetLength(i);
                     }
@@ -169,7 +178,7 @@ namespace Adita.PlexNet.Opc.Ua
                     Value = array.Cast<IEncodable>().Select(v => new ExtensionObject(v)).ToArray();
                     Type = VariantType.ExtensionObject;
                     ArrayDimensions = new int[array.Rank];
-                    for (int i = 0; i < array.Rank; i++)
+                    for (var i = 0; i < array.Rank; i++)
                     {
                         ArrayDimensions[i] = array.GetLength(i);
                     }
@@ -905,11 +914,20 @@ namespace Adita.PlexNet.Opc.Ua
             }
         }
 
-        public object? Value { get;}
+        public object? Value
+        {
+            get;
+        }
 
-        public VariantType Type { get; }
+        public VariantType Type
+        {
+            get;
+        }
 
-        public int[]? ArrayDimensions { get; }
+        public int[]? ArrayDimensions
+        {
+            get;
+        }
 
         public static implicit operator Variant(bool value)
         {
