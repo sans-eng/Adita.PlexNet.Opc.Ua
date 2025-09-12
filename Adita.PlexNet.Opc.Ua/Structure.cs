@@ -71,11 +71,14 @@ namespace Adita.PlexNet.Opc.Ua
                 decoder.PopNamespace();
             }
         }
+        #endregion Public methods
+
+        #region Protected methods
         /// <summary>
         /// When overriden, override the struct members auto encoding.
         /// </summary>
         /// <param name="encoder">The <see cref="IEncoder"/> to encode <see cref="Structure"/>.</param>
-        public virtual void OnEncoding(IEncoder encoder)
+        protected virtual void OnEncoding(IEncoder encoder)
         {
             foreach (var structMemberInfo in GetStrucMemberInfos(GetType()))
             {
@@ -90,7 +93,7 @@ namespace Adita.PlexNet.Opc.Ua
         /// When overriden, override the struct members auto decoding.
         /// </summary>
         /// <param name="decoder">The <see cref="IDecoder"/> to decode <see cref="Structure"/>.</param>
-        public virtual void OnDecoding(IDecoder decoder)
+        protected virtual void OnDecoding(IDecoder decoder)
         {
             foreach (var structMemberInfo in GetStrucMemberInfos(GetType()))
             {
@@ -101,9 +104,6 @@ namespace Adita.PlexNet.Opc.Ua
                 }
             }
         }
-        #endregion Public methods
-
-        #region Protected methods
         /// <summary>
         /// Raises <see cref="ValueChanged"/>.
         /// </summary>
