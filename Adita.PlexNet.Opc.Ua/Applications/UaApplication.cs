@@ -76,32 +76,50 @@ namespace Adita.PlexNet.Opc.Ua.Applications
         /// <summary>
         /// Gets the <see cref="ApplicationDescription"/> of the local application.
         /// </summary>
-        public ApplicationDescription LocalDescription { get; }
+        public ApplicationDescription LocalDescription
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the local certificate store.
         /// </summary>
-        public ICertificateStore? CertificateStore { get; }
+        public ICertificateStore? CertificateStore
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets an asynchronous function that provides the identity of the user. Supports <see cref="AnonymousIdentity"/>, <see cref="UserNameIdentity"/>, <see cref="IssuedIdentity"/> and <see cref="X509Identity"/>.
         /// </summary>
-        public Func<EndpointDescription, Task<IUserIdentity>>? UserIdentityProvider { get; }
+        public Func<EndpointDescription, Task<IUserIdentity>>? UserIdentityProvider
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the mapped endpoints.
         /// </summary>
-        public IEnumerable<MappedEndpoint> MappedEndpoints { get; }
+        public IEnumerable<MappedEndpoint> MappedEndpoints
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the logger factory.
         /// </summary>
-        public ILoggerFactory? LoggerFactory { get; }
+        public ILoggerFactory? LoggerFactory
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the application options.
         /// </summary>
-        public UaApplicationOptions Options { get; }
+        public UaApplicationOptions Options
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a System.Threading.Tasks.Task that represents the completion of the UaApplication.
@@ -211,12 +229,17 @@ namespace Adita.PlexNet.Opc.Ua.Applications
 
             await CheckSuspension(token).ConfigureAwait(false);
 
-            var ch = await channelMap
-                .GetOrAdd(endpointUrl, k => new Lazy<Task<ClientSessionChannel>>(() => Task.Run(() => CreateChannelAsync(k, token))))
-                .Value
-                .ConfigureAwait(false);
-
-            return ch;
+            try
+            {
+                return await channelMap
+                      .GetOrAdd(endpointUrl, k => new Lazy<Task<ClientSessionChannel>>(() => Task.Run(() => CreateChannelAsync(k, token))))
+                      .Value
+                      .ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private async Task<ClientSessionChannel> CreateChannelAsync(string endpointUrl, CancellationToken token = default)

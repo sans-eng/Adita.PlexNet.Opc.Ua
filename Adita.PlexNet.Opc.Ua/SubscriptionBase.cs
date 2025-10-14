@@ -710,7 +710,7 @@ namespace Adita.PlexNet.Opc.Ua
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogTrace($"Error getting channel. {ex.Message}");
+                    _logger?.LogError($"Error getting channel. {ex.Message}");
                     _progress.Report(CommunicationState.Faulted);
                     await Task.Delay(2000, cancellationToken);
                 }
