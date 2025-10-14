@@ -11,11 +11,11 @@
     <Copyright>©2025 Adita</Copyright>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Change structure encoding/decoding access modifier</PackageReleaseNotes>
+    <PackageReleaseNotes>Add logging on get channel failure</PackageReleaseNotes>
     <PackageTags>OPC UA; .NET; MVVM; CommunityToolkit.Mvvm;</PackageTags>
     <RepositoryUrl>https://github.com/sans-eng/Adita.PlexNet.Opc.Ua</RepositoryUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
