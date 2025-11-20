@@ -74,27 +74,10 @@ namespace Adita.PlexNet.Opc.Ua.Extensions
                     try
                     {
                         var castedInstances = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(argumentType).Invoke(null, [arrayObject]);
-                        if (typeof(T).IsArray)
+                        var arrayInstance = typeof(Enumerable).GetMethod("ToArray")!.MakeGenericMethod(argumentType).Invoke(null, [castedInstances]);
+                        if (arrayInstance is T arrayValue)
                         {
-                            var arrayInstance = typeof(Enumerable).GetMethod("ToArray")!.MakeGenericMethod(argumentType).Invoke(null, [castedInstances]);
-                            if (arrayInstance is T arrayValue)
-                            {
-                                return arrayValue;
-                            }
-                        }
-                        else
-                        {
-                            if (castedInstances is IEnumerable<Structure> structures)
-                            {
-                                var filtered = structures.Where(s => !s.IsDefault);
-                                castedInstances = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(argumentType).Invoke(null, [filtered]);
-                            }
-
-                            var collection = Activator.CreateInstance(typeof(T), castedInstances);
-                            if (collection is T collectionResult)
-                            {
-                                return collectionResult;
-                            }
+                            return arrayValue;
                         }
 
                         return default!;

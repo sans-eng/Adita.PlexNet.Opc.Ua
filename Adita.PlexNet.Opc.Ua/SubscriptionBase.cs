@@ -34,9 +34,6 @@ namespace Adita.PlexNet.Opc.Ua
         #region Private fields
         private bool _disposed;
 
-        private readonly List<StructureMonitoredItemDescriptor> _structureMonitoredItemDescriptors = [];
-        private readonly List<CollectionMonitoredItemDescriptor> _collectionMonitoredItemDescriptors = [];
-
         private readonly ActionBlock<PublishResponse> _actionBlock;
         private readonly IProgress<CommunicationState> _progress;
         private readonly ILogger? _logger;
@@ -195,8 +192,6 @@ namespace Adita.PlexNet.Opc.Ua
 
             }
 
-            RegisterStructureMonitoredItems(_monitoredItems);
-            RegisterCollectionMonitoredItems(_monitoredItems);
             _stateMachineCts = new CancellationTokenSource();
             _stateMachineTask = Task.Run(() => StateMachineAsync(_stateMachineCts.Token));
         }
@@ -341,8 +336,6 @@ namespace Adita.PlexNet.Opc.Ua
                     }
                 }
 
-                UnregisterStructureMonitoredItems();
-                UnregisterCollectionMonitoredItems();
                 _disposed = true;
             }
         }
@@ -366,30 +359,6 @@ namespace Adita.PlexNet.Opc.Ua
         #endregion Internal methods
 
         #region Private Methods
-        private void RegisterStructureMonitoredItems(MonitoredItemBaseCollection monitoredItems)
-        {
-            var structureMonitoredItems = monitoredItems.Where(m => m is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.Property.PropertyType.IsAssignableTo(typeof(Structure)))
-                .Cast<DataValueMonitoredItem>()
-                .Select(m => new StructureMonitoredItemDescriptor(this, m.Property));
-            _structureMonitoredItemDescriptors.AddRange(structureMonitoredItems);
-        }
-        private void UnregisterStructureMonitoredItems()
-        {
-            _structureMonitoredItemDescriptors.ForEach(m => m.Dispose());
-            _structureMonitoredItemDescriptors.Clear();
-        }
-        private void RegisterCollectionMonitoredItems(MonitoredItemBaseCollection monitoredItems)
-        {
-            var collectionMonitoredItems = monitoredItems.Where(m => m is DataValueMonitoredItem dataValueMonitoredItem && dataValueMonitoredItem.Property.PropertyType.IsAssignableTo(typeof(INotifyCollectionChanged)))
-                .Cast<DataValueMonitoredItem>()
-                .Select(m => new CollectionMonitoredItemDescriptor(this, m.Property));
-            _collectionMonitoredItemDescriptors.AddRange(collectionMonitoredItems);
-        }
-        private void UnregisterCollectionMonitoredItems()
-        {
-            _collectionMonitoredItemDescriptors.ForEach(m => m.Dispose());
-            _collectionMonitoredItemDescriptors.Clear();
-        }
         /// <summary>
         /// Handle PublishResponse message.
         /// </summary>
@@ -763,193 +732,6 @@ namespace Adita.PlexNet.Opc.Ua
                 get; set;
             }
             #endregion Public properties
-        }
-
-        private class StructureMonitoredItemDescriptor : IDisposable
-        {
-            #region Constructors
-            public StructureMonitoredItemDescriptor(SubscriptionBase target, PropertyInfo propertyInfo)
-            {
-                Target = target ?? throw new ArgumentNullException(nameof(target));
-                PropertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
-
-                Target.PropertyChanged += OnTargetPropertyChanged;
-                Target.PropertyChanging += OnTargetPropertyChanging;
-
-                if (Value != null)
-                {
-                    Value.ValueChanged += OnValueChanged;
-                }
-            }
-            #endregion Constructors
-
-            #region Public properties
-            public SubscriptionBase Target
-            {
-                get;
-            }
-            public PropertyInfo PropertyInfo
-            {
-                get;
-            }
-            public Structure? Value => PropertyInfo.CanRead ? PropertyInfo.GetValue(Target) as Structure : default;
-            #endregion Public properties
-
-            #region Public methods
-            public void Dispose()
-            {
-                if (Value != null)
-                {
-                    Value.ValueChanged -= OnValueChanged;
-                }
-
-                Target.PropertyChanging -= OnTargetPropertyChanging;
-                Target.PropertyChanged -= OnTargetPropertyChanged;
-            }
-            #endregion Public methods
-
-            #region Event handlers
-            private void OnTargetPropertyChanging(object? sender, PropertyChangingEventArgs e)
-            {
-                if (e.PropertyName == PropertyInfo.Name && Value != null)
-                {
-                    Value.ValueChanged -= OnValueChanged;
-                }
-            }
-            private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == PropertyInfo.Name && Value != null)
-                {
-                    Value.ValueChanged += OnValueChanged;
-                }
-            }
-            private void OnValueChanged(object? sender, EventArgs e)
-            {
-                Target.OnPropertyChanged(Target, new(PropertyInfo.Name));
-            }
-            #endregion Event handlers
-        }
-        private class CollectionMonitoredItemDescriptor
-        {
-            #region Constructors
-            public CollectionMonitoredItemDescriptor(SubscriptionBase target, PropertyInfo propertyInfo)
-            {
-                Target = target ?? throw new ArgumentNullException(nameof(target));
-                PropertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
-
-                Target.PropertyChanged += OnTargetPropertyChanged;
-                Target.PropertyChanging += OnTargetPropertyChanging;
-
-                if (Value != null)
-                {
-                    Value.CollectionChanged += OnValueCollectionChanged;
-                }
-
-                if (Value is IEnumerable<Structure> structures)
-                {
-                    RegisterMembersValueChanged(structures);
-                }
-            }
-
-            #endregion Constructors
-
-            #region Public properties
-            public SubscriptionBase Target
-            {
-                get;
-            }
-            public PropertyInfo PropertyInfo
-            {
-                get;
-            }
-            public INotifyCollectionChanged? Value => PropertyInfo.CanRead ? PropertyInfo.GetValue(Target) as INotifyCollectionChanged : default;
-            #endregion Public properties
-
-            #region Public methods
-            public void Dispose()
-            {
-                if (Value != null)
-                {
-                    Value.CollectionChanged -= OnValueCollectionChanged;
-                }
-
-                Target.PropertyChanged -= OnTargetPropertyChanged;
-
-                if (Value is IEnumerable<Structure> structures)
-                {
-                    UnregisterMembersValueChanged(structures);
-                }
-            }
-            #endregion Public methods
-
-            #region Private methods
-            private void RegisterMembersValueChanged(IEnumerable<Structure> structures)
-            {
-                foreach (var structure in structures)
-                {
-                    structure.ValueChanged += OnCollectionMemberValueChanged;
-                }
-            }
-            private void UnregisterMembersValueChanged(IEnumerable<Structure> structures)
-            {
-                foreach (var structure in structures)
-                {
-                    structure.ValueChanged -= OnCollectionMemberValueChanged;
-                }
-            }
-            #endregion
-
-            #region Event handlers
-            private void OnTargetPropertyChanging(object? sender, PropertyChangingEventArgs e)
-            {
-                if (e.PropertyName == PropertyInfo.Name && Value != null)
-                {
-                    Value.CollectionChanged -= OnValueCollectionChanged;
-                    if(Value is IEnumerable<Structure> structures)
-                    {
-                        UnregisterMembersValueChanged(structures);
-                    }
-                }
-            }
-            private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == PropertyInfo.Name && Value != null)
-                {
-                    Value.CollectionChanged += OnValueCollectionChanged;
-                    if (Value is IEnumerable<Structure> structures)
-                    {
-                        RegisterMembersValueChanged(structures);
-                    }
-                }
-            }
-            private void OnValueCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-            {
-                Target.OnPropertyChanged(Target, new(PropertyInfo.Name));
-
-                if (e.OldItems != null)
-                {
-                    var oldStructureMembers = e.OldItems?.OfType<Structure>();
-                    if (oldStructureMembers != null)
-                    {
-                        UnregisterMembersValueChanged(oldStructureMembers);
-                    }
-                }
-
-                if (e.NewItems != null)
-                {
-                    var newStructureMembers = e.NewItems?.OfType<Structure>();
-                    if (newStructureMembers != null)
-                    {
-                        RegisterMembersValueChanged(newStructureMembers);
-                    }
-                }
-            }
-
-            private void OnCollectionMemberValueChanged(object? sender, EventArgs e)
-            {
-                Target.OnPropertyChanged(Target, new(PropertyInfo.Name));
-            }
-            #endregion Event handlers
         }
     }
 }
