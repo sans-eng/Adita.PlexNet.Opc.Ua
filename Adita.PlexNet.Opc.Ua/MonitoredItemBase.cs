@@ -1,16 +1,15 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.ComponentModel.DataAnnotations;
+using System.Numerics;
+using System.Reflection;
 using Adita.PlexNet.Opc.Ua.Abstractions;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Collections;
 using Adita.PlexNet.Opc.Ua.Events;
 using Adita.PlexNet.Opc.Ua.Extensions;
 using Adita.PlexNet.Opc.Ua.Utils;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Numerics;
-using System.Reflection;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -60,57 +59,90 @@ namespace Adita.PlexNet.Opc.Ua
         /// <summary>
         /// Gets the key.
         /// </summary>
-        public string Name { get; }
+        public string Name
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the ExpandedNodeId to monitor.
         /// </summary>
-        public ExpandedNodeId NodeId { get; }
+        public ExpandedNodeId NodeId
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the attribute to monitor.
         /// </summary>
-        public uint AttributeId { get; }
+        public uint AttributeId
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the range of array indexes to monitor.
         /// </summary>
-        public string? IndexRange { get; }
+        public string? IndexRange
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the monitoring mode.
         /// </summary>
-        public MonitoringMode MonitoringMode { get; }
+        public MonitoringMode MonitoringMode
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the sampling interval.
         /// </summary>
-        public int SamplingInterval { get; }
+        public int SamplingInterval
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the filter used by the server to select values to return.
         /// </summary>
-        public MonitoringFilter? Filter { get; }
+        public MonitoringFilter? Filter
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the length of the queue used by the server to buffer values.
         /// </summary>
-        public uint QueueSize { get; }
+        public uint QueueSize
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a value indicating whether to discard the oldest entries in the queue when it is full.
         /// </summary>
-        public bool DiscardOldest { get; }
+        public bool DiscardOldest
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the identifier assigned by the client.
         /// </summary>
-        public uint ClientId { get; }
+        public uint ClientId
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets or sets the identifier assigned by the server.
         /// </summary>
-        public uint ServerId { get; protected set; }
+        public uint ServerId
+        {
+            get; protected set;
+        }
 
         public abstract void Publish(DataValue dataValue);
 
@@ -150,12 +182,18 @@ namespace Adita.PlexNet.Opc.Ua
         /// <summary>
         /// Gets the target object.
         /// </summary>
-        public object Target { get; }
+        public object Target
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the property of the target to store the published value.
         /// </summary>
-        public PropertyInfo Property { get; }
+        public PropertyInfo Property
+        {
+            get;
+        }
         #endregion Public properties
 
         #region Public methods
@@ -194,7 +232,8 @@ namespace Adita.PlexNet.Opc.Ua
         public virtual IEnumerable<ValidationResult?> Validate()
         {
             var validationAttributes = Property.GetCustomAttributes<ValidationAttribute>().Where(attr => attr is not ValidateAttribute);
-            return validationAttributes.Select(attr => {
+            return validationAttributes.Select(attr =>
+            {
                 var value = Property.GetValue(Target);
                 return attr.GetValidationResult(value, new ValidationContext(Target));
             });
@@ -288,7 +327,7 @@ namespace Adita.PlexNet.Opc.Ua
         {
             value = default;
             return false;
-        }     
+        }
     }
 
     /// <summary>
@@ -297,8 +336,6 @@ namespace Adita.PlexNet.Opc.Ua
     /// </summary>
     public class ValueMonitoredItem<T> : DataValueMonitoredItem
     {
-        private StatusCode statusCode;
-
         public ValueMonitoredItem(object target, PropertyInfo property, ExpandedNodeId nodeId, uint attributeId = 13, string? indexRange = null, MonitoringMode monitoringMode = MonitoringMode.Reporting, int samplingInterval = -1, MonitoringFilter? filter = null, uint queueSize = 0, bool discardOldest = true)
              : base(target, property, nodeId, attributeId, indexRange, monitoringMode, samplingInterval, filter, queueSize, discardOldest)
         {
@@ -321,10 +358,19 @@ namespace Adita.PlexNet.Opc.Ua
             if (pi.CanRead)
             {
                 var propertyValue = Property.GetValue(Target);
-                if (propertyValue?.GetType().IsEnum == true && serverType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBinaryInteger<>)) == true)
+                if (propertyValue?.GetType().IsEnum == true)
                 {
-                    var convertedValue = Convert.ChangeType(propertyValue, serverType);
-                    value = new DataValue(convertedValue);
+                    if (serverType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBinaryInteger<>)) == true)
+                    {
+                        var convertedValue = Convert.ChangeType(propertyValue, serverType);
+                        value = new DataValue(convertedValue);
+                    }
+                    else
+                    {
+                        var underlyingType = Enum.GetUnderlyingType(propertyValue.GetType());
+                        var convertedValue = Convert.ChangeType(propertyValue, underlyingType);
+                        value = new DataValue(convertedValue);
+                    }
                 }
                 else
                 {
@@ -333,7 +379,7 @@ namespace Adita.PlexNet.Opc.Ua
 
                 return true;
             }
-            value = default(DataValue);
+            value = default;
             return false;
         }
     }
@@ -366,12 +412,18 @@ namespace Adita.PlexNet.Opc.Ua
         /// <summary>
         /// Gets the target object.
         /// </summary>
-        public object Target { get; }
+        public object Target
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the property of the target to store the published value.
         /// </summary>
-        public PropertyInfo Property { get; }
+        public PropertyInfo Property
+        {
+            get;
+        }
 
         public override void Publish(DataValue dataValue)
         {
@@ -385,7 +437,7 @@ namespace Adita.PlexNet.Opc.Ua
 
         public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
-            value = default(DataValue);
+            value = default;
             return false;
         }
 
@@ -452,12 +504,18 @@ namespace Adita.PlexNet.Opc.Ua
         /// <summary>
         /// Gets the target object.
         /// </summary>
-        public object Target { get; }
+        public object Target
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the property of the target to store the published value.
         /// </summary>
-        public PropertyInfo Property { get; }
+        public PropertyInfo Property
+        {
+            get;
+        }
 
         public override void Publish(DataValue dataValue)
         {
@@ -472,7 +530,7 @@ namespace Adita.PlexNet.Opc.Ua
 
         public override bool TryGetValue(out DataValue? value, Type? serverType = default)
         {
-            value = default(DataValue);
+            value = default;
             return false;
         }
 
