@@ -33,10 +33,7 @@ namespace Adita.PlexNet.Opc.Ua
             ServerPicoseconds = serverPicoseconds;
         }
         [JsonIgnore]
-        public object? Value
-        {
-            get { return WrappedValue.Value; }
-        }
+        public object? Value => WrappedValue.Value;
 
         public StatusCode StatusCode { get; }
         public DateTime SourceTimestamp { get; }
