@@ -3,77 +3,29 @@
 
 using Adita.PlexNet.Opc.Ua.Channels;
 
-namespace Adita.PlexNet.Opc.Ua.Options
+namespace Adita.PlexNet.Opc.Ua.Options;
+
+/// <summary>
+/// The UaApplication options.
+/// </summary>
+public class UaApplicationOptions
 {
+    #region Public Properties
     /// <summary>
-    /// The UaApplication options.
+    /// Gets or sets <see cref="ServerCapabilitiesOptions"/> of current <see cref="UaApplicationOptions"/>.
     /// </summary>
-    public class UaApplicationOptions
+    public ServerCapabilitiesOptions ServerCapabilities
     {
-        #region Public Properties
-        public ServerCapabilitiesOptions ServerCapabilities
-        {
-            get;
-            set;
-        }
-        public ClientSessionChannelOptions ClientSessionChannel
-        {
-            get;
-            set;
-        }
-        #endregion Public Properties
-    }
-
+        get;
+        set;
+    } = new();
     /// <summary>
-    /// The <see cref="ClientSessionChannel"/> options.
+    /// Gets or sets <see cref="ClientSessionChannelOptions"/> of current <see cref="UaApplicationOptions"/>.
     /// </summary>
-    public class ClientSessionChannelOptions : ClientSecureChannelOptions
+    public ClientSessionChannelOptions ClientSessionChannel
     {
-        /// <summary>
-        /// Gets the requested number of milliseconds that a session may be unused before being closed by the server.
-        /// </summary>
-        public double SessionTimeout { get; set; } = ClientSessionChannel.DefaultSessionTimeout;
-    }
-
-    /// <summary>
-    /// The <see cref="ClientSecureChannel"/> options.
-    /// </summary>
-    public class ClientSecureChannelOptions : ClientTransportChannelOptions
-    {
-        /// <summary>
-        /// Gets or sets the default number of milliseconds that may elapse before an operation is cancelled by the service.
-        /// </summary>
-        public uint TimeoutHint { get; set; } = ClientSecureChannel.DefaultTimeoutHint;
-
-        /// <summary>
-        /// Gets or sets the default diagnostics flags to be requested by the service.
-        /// </summary>
-        public uint DiagnosticsHint { get; set; } = ClientSecureChannel.DefaultDiagnosticsHint;
-    }
-
-    /// <summary>
-    /// The <see cref="ClientTransportChannel"/> options.
-    /// </summary>
-    public class ClientTransportChannelOptions
-    {
-        /// <summary>
-        /// Gets or sets the size of the receive buffer.
-        /// </summary>
-        public uint LocalReceiveBufferSize { get; set; } = ClientTransportChannel.DefaultBufferSize;
-
-        /// <summary>
-        /// Gets or sets the size of the send buffer.
-        /// </summary>
-        public uint LocalSendBufferSize { get; set; } = ClientTransportChannel.DefaultBufferSize;
-
-        /// <summary>
-        /// Gets or sets the maximum total size of a message.
-        /// </summary>
-        public uint LocalMaxMessageSize { get; set; } = ClientTransportChannel.DefaultMaxMessageSize;
-
-        /// <summary>
-        /// Gets or sets the maximum number of message chunks.
-        /// </summary>
-        public uint LocalMaxChunkCount { get; set; } = ClientTransportChannel.DefaultMaxChunkCount;
-    }
+        get;
+        set;
+    } = new();
+    #endregion Public Properties
 }
