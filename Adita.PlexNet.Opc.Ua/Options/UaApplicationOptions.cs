@@ -20,6 +20,14 @@ public class UaApplicationOptions
         set;
     } = new();
     /// <summary>
+    /// Gets or sets <see cref="OperationLimitsOptions"/> of current <see cref="UaApplicationOptions"/>.
+    /// </summary>
+    public OperationLimitsOptions OperationLimits
+    {
+        get;
+        set;
+    } = new();
+    /// <summary>
     /// Gets or sets <see cref="ClientSessionChannelOptions"/> of current <see cref="UaApplicationOptions"/>.
     /// </summary>
     public ClientSessionChannelOptions ClientSessionChannel
