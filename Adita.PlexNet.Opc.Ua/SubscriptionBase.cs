@@ -31,6 +31,10 @@ namespace Adita.PlexNet.Opc.Ua
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<MonitoredItemPropertyInfoDescriptor>> _cachedMonitoredItemPropertyInfoDescriptors = [];
         #endregion Caching fields
 
+        #region Protected static properties
+        protected static readonly IList<uint> SubscriptionIds = [];
+        #endregion Protected static properties
+
         #region Private fields
         private bool _disposed;
 
@@ -338,6 +342,7 @@ namespace Adita.PlexNet.Opc.Ua
 
                 _disposed = true;
             }
+            SubscriptionIds.Remove(SubscriptionId);
         }
         #endregion Protected methods
 
@@ -572,6 +577,7 @@ namespace Adita.PlexNet.Opc.Ua
 
                         // link up the dataflow blocks
                         var id = _subscriptionId = subscriptionResponse.SubscriptionId;
+                        SubscriptionIds.Add(id);
                         var linkToken = _innerChannel.LinkTo(_actionBlock, pr => pr.SubscriptionId == id);
 
                         try

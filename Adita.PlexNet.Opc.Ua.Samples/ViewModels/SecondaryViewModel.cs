@@ -9,7 +9,7 @@ namespace Adita.PlexNet.Opc.Ua.Samples.ViewModels;
 public partial class SecondaryViewModel : SubscriptionBase
 {
     [ObservableProperty]
-    [MonitoredItem("ns=4;s=|var|c500.Application.gMain.lrValue")]
+    //[MonitoredItem("ns=4;s=|var|c500.Application.gMain.lrValue")]
     [Validate]
     [CompareRange(nameof(MinValue), nameof(MaxValue))]
     [NotifyDataErrorInfo]
@@ -20,10 +20,10 @@ public partial class SecondaryViewModel : SubscriptionBase
     private double _maxValue = 20;
 
     [ObservableProperty]
-    [MonitoredItem("ns=4;s=|var|c500.Application.gMain.lrValue")]
-    [Validate]
-    [CompareRange(nameof(MinValue), nameof(MaxValue))]
-    [NotifyDataErrorInfo]
+    //[MonitoredItem("ns=4;s=|var|c500.Application.gMain.lrValue")]
+   // [Validate]
+    //[CompareRange(nameof(MinValue), nameof(MaxValue))]
+    //[NotifyDataErrorInfo]
     private double _value1;
     public SecondaryViewModel()
     {
