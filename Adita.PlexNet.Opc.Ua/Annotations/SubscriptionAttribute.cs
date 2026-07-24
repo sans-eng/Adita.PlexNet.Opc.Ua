@@ -19,13 +19,14 @@ namespace Adita.PlexNet.Opc.Ua.Annotations
         /// <param name="keepAliveCount">the number of PublishingIntervals before the server should return an empty Publish response.</param>
         /// <param name="lifetimeCount">the number of PublishingIntervals before the server should delete the subscription.</param>
         /// <param name="publishingEnabled">whether publishing is enabled.</param>
-        public SubscriptionAttribute(string endpointUrl, double publishingInterval = 1000f, uint keepAliveCount = 10, uint lifetimeCount = 0, bool publishingEnabled = true)
+        public SubscriptionAttribute(string endpointUrl, double publishingInterval = 1000f, uint keepAliveCount = 10, uint lifetimeCount = 0, bool publishingEnabled = true, bool isBatched = false)
         {
             EndpointUrl = endpointUrl;
             PublishingInterval = publishingInterval;
             KeepAliveCount = keepAliveCount;
             LifetimeCount = lifetimeCount;
             PublishingEnabled = publishingEnabled;
+            IsBatched = isBatched;
         }
 
         /// <summary>
@@ -52,5 +53,9 @@ namespace Adita.PlexNet.Opc.Ua.Annotations
         /// Gets a value indicating whether publishing is enabled.
         /// </summary>
         public bool PublishingEnabled { get; }
+        /// <summary>
+        /// Gets or sets whether the subscription is batched.
+        /// </summary>
+        public bool IsBatched { get; }
     }
 }

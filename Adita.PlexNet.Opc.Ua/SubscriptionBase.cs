@@ -1,17 +1,6 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Adita.PlexNet.Opc.Ua.Abstractions;
-using Adita.PlexNet.Opc.Ua.Annotations;
-using Adita.PlexNet.Opc.Ua.Applications;
-using Adita.PlexNet.Opc.Ua.Channels;
-using Adita.PlexNet.Opc.Ua.Collections;
-using Adita.PlexNet.Opc.Ua.Events;
-using Adita.PlexNet.Opc.Ua.Extensions;
-using Adita.PlexNet.Opc.Ua.Internal.Extensions;
-using Adita.PlexNet.Opc.Ua.Utils;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -19,6 +8,20 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks.Dataflow;
+using Adita.PlexNet.Opc.Ua.Abstractions;
+using Adita.PlexNet.Opc.Ua.Abstractions.Channels;
+using Adita.PlexNet.Opc.Ua.Annotations;
+using Adita.PlexNet.Opc.Ua.Applications;
+using Adita.PlexNet.Opc.Ua.Channels;
+using Adita.PlexNet.Opc.Ua.Collections;
+using Adita.PlexNet.Opc.Ua.Events;
+using Adita.PlexNet.Opc.Ua.Extensions;
+using Adita.PlexNet.Opc.Ua.Internal.Extensions;
+using Adita.PlexNet.Opc.Ua.Options;
+using Adita.PlexNet.Opc.Ua.Utils;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -31,12 +34,11 @@ namespace Adita.PlexNet.Opc.Ua
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<MonitoredItemPropertyInfoDescriptor>> _cachedMonitoredItemPropertyInfoDescriptors = [];
         #endregion Caching fields
 
-        #region Protected static properties
-        protected static readonly IList<uint> SubscriptionIds = [];
-        #endregion Protected static properties
-
         #region Private fields
         private bool _disposed;
+
+        private readonly ServerCapabilitiesOptions _serverCapabilitiesOptions;
+        private readonly OperationLimitsOptions _operationLimitsOptions;
 
         private readonly ActionBlock<PublishResponse> _actionBlock;
         private readonly IProgress<CommunicationState> _progress;
@@ -49,6 +51,7 @@ namespace Adita.PlexNet.Opc.Ua
         private readonly double _publishingInterval = ClientSessionChannel.DefaultPublishingInterval;
         private readonly uint _keepAliveCount = ClientSessionChannel.DefaultKeepaliveCount;
         private readonly uint _lifetimeCount;
+        private readonly bool _isBatched;
         private readonly MonitoredItemBaseCollection _monitoredItems = [];
         private CommunicationState _state = CommunicationState.Created;
         // private volatile TaskCompletionSource<bool> whenSubscribed;
@@ -58,6 +61,10 @@ namespace Adita.PlexNet.Opc.Ua
 
         private readonly Dictionary<string, List<string>> _errors = [];
         #endregion Private fields
+
+        #region Protected static properties
+        protected internal static IList<uint> SubscriptionIds => [];
+        #endregion Protected static properties
 
         #region Constructors
         /// <summary>
@@ -76,6 +83,8 @@ namespace Adita.PlexNet.Opc.Ua
         {
             _application = application ?? throw new ArgumentNullException(nameof(application));
             _application.Completion.ContinueWith(t => _stateMachineCts?.Cancel());
+            _serverCapabilitiesOptions = _application.Options.ServerCapabilities;
+            _operationLimitsOptions = _application.Options.OperationLimits;
             _logger = _application.LoggerFactory?.CreateLogger(GetType());
             _progress = new Progress<CommunicationState>(s => State = s);
             PropertyChanged += OnPropertyChanged;
@@ -99,6 +108,7 @@ namespace Adita.PlexNet.Opc.Ua
                 _publishingInterval = sa.PublishingInterval;
                 _keepAliveCount = sa.KeepAliveCount;
                 _lifetimeCount = sa.LifetimeCount;
+                _isBatched = sa.IsBatched;
             }
 
             // read [MonitoredItem] attributes.
@@ -364,6 +374,35 @@ namespace Adita.PlexNet.Opc.Ua
         #endregion Internal methods
 
         #region Private Methods
+        private CreateSubscriptionRequest CreateSubscriptionRequest()
+        {
+            return new CreateSubscriptionRequest
+            {
+                RequestedPublishingInterval = _publishingInterval,
+                RequestedMaxKeepAliveCount = _keepAliveCount,
+                RequestedLifetimeCount = Math.Max(_lifetimeCount, 3 * _keepAliveCount),
+                PublishingEnabled = true
+            };
+        }
+        private async Task<uint> CreateOrGetSubscriptionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_isBatched)
+            {
+                foreach (var subscriptionId in SubscriptionIds)
+                {
+                    var monitoredItems = await InnerChannel.GetMonitoredItems(subscriptionId, cancellationToken);
+                    if (monitoredItems.Count() < _serverCapabilitiesOptions.MaxMonitoredItemsPerSubscription)
+                    {
+                        return subscriptionId;
+                    }
+                }
+            }
+
+            var subscriptionRequest = CreateSubscriptionRequest();
+
+            var subscriptionResponse = await InnerChannel.CreateSubscriptionAsync(subscriptionRequest, cancellationToken).ConfigureAwait(false);
+            return subscriptionResponse.SubscriptionId;
+        }
         /// <summary>
         /// Handle PublishResponse message.
         /// </summary>
@@ -553,142 +592,135 @@ namespace Adita.PlexNet.Opc.Ua
 
                 _progress.Report(CommunicationState.Opening);
 
+                if (_endpointUrl is null)
+                {
+                    throw new InvalidOperationException("The endpointUrl field must not be null. Please, use the Subscription attribute properly.");
+                }
+
                 try
                 {
-                    if (_endpointUrl is null)
-                    {
-                        throw new InvalidOperationException("The endpointUrl field must not be null. Please, use the Subscription attribute properly.");
-                    }
-
                     // get a channel.
                     _innerChannel = await _application.GetChannelAsync(_endpointUrl, cancellationToken);
+                }
+                catch (Exception exception)
+                {
+                    _logger?.LogError(exception, "Error getting channel: {Message}", exception.Message);
+                    _progress.Report(CommunicationState.Faulted);
+                    await Task.Delay(2000, cancellationToken);
+                    return;
+                }
 
-                    try
+                IDisposable? linkToken = default;
+
+                try
+                {
+                    _subscriptionId = await CreateOrGetSubscriptionAsync(cancellationToken);
+                    SubscriptionIds.Add(_subscriptionId);
+                    linkToken = _innerChannel.LinkTo(_actionBlock, pr => pr.SubscriptionId == _subscriptionId);
+                }
+                catch (Exception exception)
+                {
+                    _logger?.LogError(exception, "Error creating or get subscription: {Message}", exception.Message);
+                    _progress.Report(CommunicationState.Faulted);
+                    await Task.Delay(2000, cancellationToken);
+                    return;
+                }
+
+                try
+                {
+                    var items = _monitoredItems.ToList();
+                    if (items.Count > 0)
                     {
-                        // create the subscription.
-                        var subscriptionRequest = new CreateSubscriptionRequest
-                        {
-                            RequestedPublishingInterval = _publishingInterval,
-                            RequestedMaxKeepAliveCount = _keepAliveCount,
-                            RequestedLifetimeCount = Math.Max(_lifetimeCount, 3 * _keepAliveCount),
-                            PublishingEnabled = true
-                        };
-                        var subscriptionResponse = await _innerChannel.CreateSubscriptionAsync(subscriptionRequest, cancellationToken).ConfigureAwait(false);
+                        var requests = items.Select(m => new MonitoredItemCreateRequest { ItemToMonitor = new ReadValueId { NodeId = ExpandedNodeId.ToNodeId(m.NodeId, InnerChannel.NamespaceUris), AttributeId = m.AttributeId, IndexRange = m.IndexRange }, MonitoringMode = m.MonitoringMode, RequestedParameters = new MonitoringParameters { ClientHandle = m.ClientId, DiscardOldest = m.DiscardOldest, QueueSize = m.QueueSize, SamplingInterval = m.SamplingInterval, Filter = m.Filter } }).ToArray();
 
-                        // link up the dataflow blocks
-                        var id = _subscriptionId = subscriptionResponse.SubscriptionId;
-                        SubscriptionIds.Add(id);
-                        var linkToken = _innerChannel.LinkTo(_actionBlock, pr => pr.SubscriptionId == id);
-
-                        try
+                        //split requests array to MaxMonitoredItemsPerCall chunks
+                        var maxmonitoreditemspercall = 100;
+                        MonitoredItemCreateRequest[] requests_chunk;
+                        int chunk_size;
+                        for (var i_chunk = 0; i_chunk < requests.Length; i_chunk += maxmonitoreditemspercall)
                         {
-                            // create the monitored items.
-                            var items = _monitoredItems.ToList();
-                            if (items.Count > 0)
+                            chunk_size = Math.Min(maxmonitoreditemspercall, requests.Length - i_chunk);
+                            requests_chunk = new MonitoredItemCreateRequest[chunk_size];
+                            Array.Copy(requests, i_chunk, requests_chunk, 0, chunk_size);
+
+                            var itemsRequest = new CreateMonitoredItemsRequest
                             {
-                                var requests = items.Select(m => new MonitoredItemCreateRequest { ItemToMonitor = new ReadValueId { NodeId = ExpandedNodeId.ToNodeId(m.NodeId, InnerChannel.NamespaceUris), AttributeId = m.AttributeId, IndexRange = m.IndexRange }, MonitoringMode = m.MonitoringMode, RequestedParameters = new MonitoringParameters { ClientHandle = m.ClientId, DiscardOldest = m.DiscardOldest, QueueSize = m.QueueSize, SamplingInterval = m.SamplingInterval, Filter = m.Filter } }).ToArray();
+                                SubscriptionId = _subscriptionId,
+                                ItemsToCreate = requests_chunk,
+                            };
+                            var itemsResponse = await _innerChannel.CreateMonitoredItemsAsync(itemsRequest);
 
-                                //split requests array to MaxMonitoredItemsPerCall chunks
-                                var maxmonitoreditemspercall = 100;
-                                MonitoredItemCreateRequest[] requests_chunk;
-                                int chunk_size;
-                                for (var i_chunk = 0; i_chunk < requests.Length; i_chunk += maxmonitoreditemspercall)
+                            if (itemsResponse.Results is { } results)
+                            {
+                                for (var i = 0; i < results.Length; i++)
                                 {
-                                    chunk_size = Math.Min(maxmonitoreditemspercall, requests.Length - i_chunk);
-                                    requests_chunk = new MonitoredItemCreateRequest[chunk_size];
-                                    Array.Copy(requests, i_chunk, requests_chunk, 0, chunk_size);
+                                    var item = items[i];
+                                    var result = results[i];
 
-                                    var itemsRequest = new CreateMonitoredItemsRequest
+                                    if (result is null)
                                     {
-                                        SubscriptionId = id,
-                                        ItemsToCreate = requests_chunk,
-                                    };
-                                    var itemsResponse = await _innerChannel.CreateMonitoredItemsAsync(itemsRequest);
+                                        _logger?.LogError("Error creating MonitoredItem for {NodeId) . The result is null.", item.NodeId);
+                                        continue;
+                                    }
 
-                                    if (itemsResponse.Results is { } results)
+                                    item.OnCreateResult(result);
+                                    if (StatusCode.IsBad(result.StatusCode))
                                     {
-                                        for (var i = 0; i < results.Length; i++)
-                                        {
-                                            var item = items[i];
-                                            var result = results[i];
-
-                                            if (result is null)
-                                            {
-                                                _logger?.LogError($"Error creating MonitoredItem for {item.NodeId}. The result is null.");
-                                                continue;
-                                            }
-
-                                            item.OnCreateResult(result);
-                                            if (StatusCode.IsBad(result.StatusCode))
-                                            {
-                                                _logger?.LogError($"Error creating MonitoredItem for {item.NodeId}. {StatusCodes.GetDefaultMessage(result.StatusCode)}");
-                                            }
-                                        }
+                                        _logger?.LogError("Error creating MonitoredItem for {NodeId}. {Message}", item.NodeId, StatusCodes.GetDefaultMessage(result.StatusCode));
                                     }
                                 }
                             }
-
-                            _progress.Report(CommunicationState.Opened);
-
-                            // wait here until channel is closing, unsubscribed or token cancelled.
-                            try
-                            {
-                                await WhenChannelClosingAsync(_innerChannel, cancellationToken);
-                                //await Task.WhenAny(
-                                //    this.WhenChannelClosingAsync(this.innerChannel, token),
-                                //    this.whenUnsubscribed.Task);
-                            }
-                            catch
-                            {
-                            }
-                            finally
-                            {
-                                _progress.Report(CommunicationState.Closing);
-                            }
                         }
-                        catch (Exception ex)
-                        {
-                            _logger?.LogError($"Error creating MonitoredItems. {ex.Message}");
-                            _progress.Report(CommunicationState.Faulted);
-                        }
-                        finally
-                        {
-                            linkToken.Dispose();
-                        }
-
-                        if (_innerChannel.State == CommunicationState.Opened)
-                        {
-                            try
-                            {
-                                // delete the subscription.
-                                var deleteRequest = new DeleteSubscriptionsRequest
-                                {
-                                    SubscriptionIds = [id]
-                                };
-                                await _innerChannel.DeleteSubscriptionsAsync(deleteRequest, cancellationToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger?.LogError($"Error deleting subscription. {ex.Message}");
-                                await Task.Delay(2000, cancellationToken);
-                            }
-                        }
-
-                        _progress.Report(CommunicationState.Closed);
                     }
-                    catch (Exception ex)
+
+                    _progress.Report(CommunicationState.Opened);
+                }
+                catch (Exception exception)
+                {
+                    _logger?.LogError(exception, "Error creating MonitoredItems: {Message}", exception.Message);
+                    _progress.Report(CommunicationState.Faulted);
+                }
+
+                // wait here until channel is closing, unsubscribed or token cancelled.
+                try
+                {
+                    await WhenChannelClosingAsync(_innerChannel, cancellationToken);
+                    //await Task.WhenAny(
+                    //    this.WhenChannelClosingAsync(this.innerChannel, token),
+                    //    this.whenUnsubscribed.Task);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    _progress.Report(CommunicationState.Closing);
+                }
+
+
+                if (_innerChannel.State == CommunicationState.Opened)
+                {
+                    try
                     {
-                        _logger?.LogError($"Error creating subscription. {ex.Message}");
-                        _progress.Report(CommunicationState.Faulted);
+                        // delete the subscription.
+                        var deleteRequest = new DeleteSubscriptionsRequest
+                        {
+                            SubscriptionIds = [_subscriptionId]
+                        };
+                        await _innerChannel.DeleteSubscriptionsAsync(deleteRequest, cancellationToken);
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger?.LogError(exception, "Error deleting subscription: {Message}", exception.Message);
                         await Task.Delay(2000, cancellationToken);
                     }
+                    finally
+                    {
+                        linkToken?.Dispose();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger?.LogError($"Error getting channel. {ex.Message}");
-                    _progress.Report(CommunicationState.Faulted);
-                    await Task.Delay(2000, cancellationToken);
-                }
+
+                _progress.Report(CommunicationState.Closed);
             }
         }
 

@@ -7,102 +7,134 @@
 
 using Adita.PlexNet.Opc.Ua.Abstractions.Channels;
 
-namespace Adita.PlexNet.Opc.Ua.Extensions
+namespace Adita.PlexNet.Opc.Ua.Extensions;
+
+/// <summary>
+/// Represents a monitored item service set extensions.
+/// </summary>
+public static class MonitoredItemServiceSetExtensions
 {
     /// <summary>
-    /// Represents a monitored item service set extensions.
+    /// Creates and adds one or more MonitoredItems to a Subscription.
     /// </summary>
-    public static class MonitoredItemServiceSetExtensions
+    /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
+    /// <param name="request">A <see cref="CreateMonitoredItemsRequest"/>.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="CreateMonitoredItemsResponse"/>.</returns>
+    /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.2/">OPC UA specification Part 4: Services, 5.12.2</seealso>
+    public static async Task<CreateMonitoredItemsResponse> CreateMonitoredItemsAsync(this IRequestChannel channel, CreateMonitoredItemsRequest request, CancellationToken token = default)
     {
-        /// <summary>
-        /// Creates and adds one or more MonitoredItems to a Subscription.
-        /// </summary>
-        /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
-        /// <param name="request">A <see cref="CreateMonitoredItemsRequest"/>.</param>
-        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="CreateMonitoredItemsResponse"/>.</returns>
-        /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.2/">OPC UA specification Part 4: Services, 5.12.2</seealso>
-        public static async Task<CreateMonitoredItemsResponse> CreateMonitoredItemsAsync(this IRequestChannel channel, CreateMonitoredItemsRequest request, CancellationToken token = default)
+        if (request == null)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            return (CreateMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
+            throw new ArgumentNullException(nameof(request));
         }
 
-        /// <summary>
-        /// Modifies MonitoredItems of a Subscription.
-        /// </summary>
-        /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
-        /// <param name="request">A <see cref="ModifyMonitoredItemsRequest"/>.</param>
-        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="ModifyMonitoredItemsResponse"/>.</returns>
-        /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.3/">OPC UA specification Part 4: Services, 5.12.3</seealso>
-        public static async Task<ModifyMonitoredItemsResponse> ModifyMonitoredItemsAsync(this IRequestChannel channel, ModifyMonitoredItemsRequest request, CancellationToken token = default)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            return (ModifyMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Sets the monitoring mode for one or more MonitoredItems of a Subscription.
-        /// </summary>
-        /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
-        /// <param name="request">A <see cref="SetMonitoringModeRequest"/>.</param>
-        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="SetMonitoringModeResponse"/>.</returns>
-        /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.4/">OPC UA specification Part 4: Services, 5.12.4</seealso>
-        public static async Task<SetMonitoringModeResponse> SetMonitoringModeAsync(this IRequestChannel channel, SetMonitoringModeRequest request, CancellationToken token = default)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            return (SetMonitoringModeResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Creates and deletes triggering links for a triggering item.
-        /// </summary>
-        /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
-        /// <param name="request">A <see cref="SetTriggeringRequest"/>.</param>
-        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="SetTriggeringResponse"/>.</returns>
-        /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.5/">OPC UA specification Part 4: Services, 5.12.5</seealso>
-        public static async Task<SetTriggeringResponse> SetTriggeringAsync(this IRequestChannel channel, SetTriggeringRequest request, CancellationToken token = default)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            return (SetTriggeringResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Removes one or more MonitoredItems of a Subscription.
-        /// </summary>
-        /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
-        /// <param name="request">A <see cref="DeleteMonitoredItemsRequest"/>.</param>
-        /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="DeleteMonitoredItemsResponse"/>.</returns>
-        /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.6/">OPC UA specification Part 4: Services, 5.12.6</seealso>
-        public static async Task<DeleteMonitoredItemsResponse> DeleteMonitoredItemsAsync(this IRequestChannel channel, DeleteMonitoredItemsRequest request, CancellationToken token = default)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            return (DeleteMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
-        }
-
+        return (CreateMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Modifies MonitoredItems of a Subscription.
+    /// </summary>
+    /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
+    /// <param name="request">A <see cref="ModifyMonitoredItemsRequest"/>.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="ModifyMonitoredItemsResponse"/>.</returns>
+    /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.3/">OPC UA specification Part 4: Services, 5.12.3</seealso>
+    public static async Task<ModifyMonitoredItemsResponse> ModifyMonitoredItemsAsync(this IRequestChannel channel, ModifyMonitoredItemsRequest request, CancellationToken token = default)
+    {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        return (ModifyMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Sets the monitoring mode for one or more MonitoredItems of a Subscription.
+    /// </summary>
+    /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
+    /// <param name="request">A <see cref="SetMonitoringModeRequest"/>.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="SetMonitoringModeResponse"/>.</returns>
+    /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.4/">OPC UA specification Part 4: Services, 5.12.4</seealso>
+    public static async Task<SetMonitoringModeResponse> SetMonitoringModeAsync(this IRequestChannel channel, SetMonitoringModeRequest request, CancellationToken token = default)
+    {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        return (SetMonitoringModeResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Creates and deletes triggering links for a triggering item.
+    /// </summary>
+    /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
+    /// <param name="request">A <see cref="SetTriggeringRequest"/>.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="SetTriggeringResponse"/>.</returns>
+    /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.5/">OPC UA specification Part 4: Services, 5.12.5</seealso>
+    public static async Task<SetTriggeringResponse> SetTriggeringAsync(this IRequestChannel channel, SetTriggeringRequest request, CancellationToken token = default)
+    {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        return (SetTriggeringResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Removes one or more MonitoredItems of a Subscription.
+    /// </summary>
+    /// <param name="channel">A instance of <see cref="IRequestChannel"/>.</param>
+    /// <param name="request">A <see cref="DeleteMonitoredItemsRequest"/>.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> to cancel the operation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation that returns a <see cref="DeleteMonitoredItemsResponse"/>.</returns>
+    /// <seealso href="https://reference.opcfoundation.org/v104/Core/docs/Part4/5.12.6/">OPC UA specification Part 4: Services, 5.12.6</seealso>
+    public static async Task<DeleteMonitoredItemsResponse> DeleteMonitoredItemsAsync(this IRequestChannel channel, DeleteMonitoredItemsRequest request, CancellationToken token = default)
+    {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        return (DeleteMonitoredItemsResponse)await channel.RequestAsync(request, token).ConfigureAwait(false);
+    }
+
+    public static async Task<IEnumerable<uint>> GetMonitoredItems(this IRequestChannel channel, uint subscriptionId, CancellationToken token = default)
+    {
+        var inputArguments = new Variant[] { subscriptionId };
+        var callMethodRequest = new CallMethodRequest
+        {
+            MethodId = NodeId.Parse(MethodIds.ServerType_GetMonitoredItems),
+            ObjectId = NodeId.Parse(ObjectIds.Server),
+            InputArguments = inputArguments
+        };
+
+        var request = new CallRequest
+        {
+            MethodsToCall = [callMethodRequest]
+        };
+
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        var response =  await channel.RequestAsync(request, token).ConfigureAwait(false) as CallResponse;
+        if (response?.ResponseHeader?.ServiceResult is StatusCode statusCode && StatusCode.IsGood(statusCode) && response?.Results?.Length > 0)
+        {
+            var outputArguments = response.Results[0]?.OutputArguments;
+            if (outputArguments?.Length > 0)
+            {
+                var serverHandle = outputArguments[0];
+                return  serverHandle.Value as uint[] ?? [];
+            }
+        }
+        return [];
+    }
+
 }
