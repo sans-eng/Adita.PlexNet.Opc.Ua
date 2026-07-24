@@ -384,14 +384,16 @@ namespace Adita.PlexNet.Opc.Ua
                 PublishingEnabled = true
             };
         }
-        private async Task<uint> CreateOrGetSubscriptionAsync(CancellationToken cancellationToken = default)
+        private async Task<uint> CreateOrGetSubscriptionAsync(int itemsCount, CancellationToken cancellationToken = default)
         {
             if (_isBatched)
             {
                 foreach (var subscriptionId in SubscriptionIds)
                 {
                     var monitoredItems = await InnerChannel.GetMonitoredItems(subscriptionId, cancellationToken);
-                    if (monitoredItems.Count() < _serverCapabilitiesOptions.MaxMonitoredItemsPerSubscription)
+                    var monitoredItemsCount = monitoredItems.Count();
+                    var postItemsCount = monitoredItemsCount + itemsCount;
+                    if (postItemsCount < _serverCapabilitiesOptions.MaxMonitoredItemsPerSubscription)
                     {
                         return subscriptionId;
                     }
@@ -611,10 +613,11 @@ namespace Adita.PlexNet.Opc.Ua
                 }
 
                 IDisposable? linkToken = default;
+                var items = _monitoredItems.ToList();
 
                 try
                 {
-                    _subscriptionId = await CreateOrGetSubscriptionAsync(cancellationToken);
+                    _subscriptionId = await CreateOrGetSubscriptionAsync(items.Count, cancellationToken);
                     SubscriptionIds.Add(_subscriptionId);
                     linkToken = _innerChannel.LinkTo(_actionBlock, pr => pr.SubscriptionId == _subscriptionId);
                 }
@@ -628,7 +631,6 @@ namespace Adita.PlexNet.Opc.Ua
 
                 try
                 {
-                    var items = _monitoredItems.ToList();
                     if (items.Count > 0)
                     {
                         var requests = items.Select(m => new MonitoredItemCreateRequest { ItemToMonitor = new ReadValueId { NodeId = ExpandedNodeId.ToNodeId(m.NodeId, InnerChannel.NamespaceUris), AttributeId = m.AttributeId, IndexRange = m.IndexRange }, MonitoringMode = m.MonitoringMode, RequestedParameters = new MonitoringParameters { ClientHandle = m.ClientId, DiscardOldest = m.DiscardOldest, QueueSize = m.QueueSize, SamplingInterval = m.SamplingInterval, Filter = m.Filter } }).ToArray();
@@ -717,6 +719,7 @@ namespace Adita.PlexNet.Opc.Ua
                     finally
                     {
                         linkToken?.Dispose();
+                        SubscriptionIds.Remove(_subscriptionId);
                     }
                 }
 
