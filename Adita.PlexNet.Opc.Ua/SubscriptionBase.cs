@@ -63,7 +63,8 @@ namespace Adita.PlexNet.Opc.Ua
         #endregion Private fields
 
         #region Protected static properties
-        protected internal static IList<uint> SubscriptionIds => [];
+        private static readonly IList<uint> SubscriptionIds = [];
+        private static readonly object _lock = new();
         #endregion Protected static properties
 
         #region Constructors
