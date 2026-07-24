@@ -8,14 +8,15 @@
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:ic="using:Microsoft.Xaml.Interactions.Core">
 
-    <i:Interaction.Behaviors>
+    <!--<i:Interaction.Behaviors>
         <ic:EventTriggerBehavior EventName="Unloaded">
             <ic:InvokeCommandAction Command="{x:Bind ViewModel.DisposeCommand}"/>
         </ic:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    </i:Interaction.Behaviors>-->
 
     <Grid x:Name="ContentArea">
         <StackPanel>
+            <TextBlock Margin="0,0,0,10" Text="{x:Bind ViewModel.SubscriptionId, Mode=OneTime}"/>
             <NumberBox Value="{x:Bind ViewModel.Doublevalue, Mode=TwoWay}"/>
             <TextBlock Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}" Text="HasError"/>
             <TextBlock Margin="0,10,0,0" Text="{x:Bind ViewModel.MonitoredItemsCount, Mode=OneWay}"/>

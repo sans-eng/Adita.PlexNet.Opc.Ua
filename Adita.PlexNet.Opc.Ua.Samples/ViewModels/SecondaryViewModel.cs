@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Adita.PlexNet.Opc.Ua.Samples.ViewModels;
 
-[Subscription("Main")]
+[Subscription("Main", isBatched: true)]
 public partial class SecondaryViewModel : SubscriptionBase
 {
     [ObservableProperty]
