@@ -1,6 +1,13 @@
 ﻿// Copyright (c) 2025 Adita.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks.Dataflow;
 using Adita.PlexNet.Opc.Ua.Abstractions;
 using Adita.PlexNet.Opc.Ua.Annotations;
 using Adita.PlexNet.Opc.Ua.Applications;
@@ -12,13 +19,6 @@ using Adita.PlexNet.Opc.Ua.Internal.Extensions;
 using Adita.PlexNet.Opc.Ua.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks.Dataflow;
 
 namespace Adita.PlexNet.Opc.Ua
 {
@@ -30,6 +30,8 @@ namespace Adita.PlexNet.Opc.Ua
         #region Caching fields
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<MonitoredItemPropertyInfoDescriptor>> _cachedMonitoredItemPropertyInfoDescriptors = [];
         #endregion Caching fields
+
+        private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
         #region Private fields
         private bool _disposed;
@@ -323,8 +325,12 @@ namespace Adita.PlexNet.Opc.Ua
         {
             if (!_disposed)
             {
-                if (disposing && State == CommunicationState.Opened)
+
+                // await _stateMachineCts.CancelAsync();
+
+                if (disposing && (State == CommunicationState.Opened || State == CommunicationState.Opening))
                 {
+                   await _semaphoreSlim.WaitAsync();
                     try
                     {
                         await InnerChannel.DeleteSubscriptionsAsync(new DeleteSubscriptionsRequest() { SubscriptionIds = [SubscriptionId] });
@@ -333,6 +339,10 @@ namespace Adita.PlexNet.Opc.Ua
                     {
 
                         throw;
+                    }
+                    finally
+                    {
+                        _semaphoreSlim.Release();
                     }
                 }
 
@@ -560,6 +570,7 @@ namespace Adita.PlexNet.Opc.Ua
 
                     try
                     {
+                        await _semaphoreSlim.WaitAsync(cancellationToken);
                         // create the subscription.
                         var subscriptionRequest = new CreateSubscriptionRequest
                         {
@@ -623,22 +634,6 @@ namespace Adita.PlexNet.Opc.Ua
                             }
 
                             _progress.Report(CommunicationState.Opened);
-
-                            // wait here until channel is closing, unsubscribed or token cancelled.
-                            try
-                            {
-                                await WhenChannelClosingAsync(_innerChannel, cancellationToken);
-                                //await Task.WhenAny(
-                                //    this.WhenChannelClosingAsync(this.innerChannel, token),
-                                //    this.whenUnsubscribed.Task);
-                            }
-                            catch
-                            {
-                            }
-                            finally
-                            {
-                                _progress.Report(CommunicationState.Closing);
-                            }
                         }
                         catch (Exception ex)
                         {
@@ -647,19 +642,34 @@ namespace Adita.PlexNet.Opc.Ua
                         }
                         finally
                         {
+                            _semaphoreSlim.Release();
+                        }
+
+                        // wait here until channel is closing, unsubscribed or token cancelled.
+                        try
+                        {
+                            await WhenChannelClosingAsync(_innerChannel, cancellationToken);
+                            //await Task.WhenAny(
+                            //    this.WhenChannelClosingAsync(this.innerChannel, token),
+                            //    this.whenUnsubscribed.Task);
+                        }
+                        catch
+                        {
+                        }
+                        finally
+                        {
                             linkToken.Dispose();
+                            _progress.Report(CommunicationState.Closing);
                         }
 
                         if (_innerChannel.State == CommunicationState.Opened)
                         {
                             try
                             {
-                                // delete the subscription.
-                                var deleteRequest = new DeleteSubscriptionsRequest
+                                await _innerChannel.DeleteSubscriptionsAsync(new DeleteSubscriptionsRequest
                                 {
                                     SubscriptionIds = [id]
-                                };
-                                await _innerChannel.DeleteSubscriptionsAsync(deleteRequest, cancellationToken);
+                                }, cancellationToken);
                             }
                             catch (Exception ex)
                             {
