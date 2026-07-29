@@ -7,13 +7,14 @@
     mc:Ignorable="d"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
 xmlns:ic="using:Microsoft.Xaml.Interactions.Core">
-    <i:Interaction.Behaviors>
+    <!--<i:Interaction.Behaviors>
         <ic:EventTriggerBehavior EventName="Unloaded">
             <ic:InvokeCommandAction Command="{x:Bind ViewModel.DisposeCommand}"/>
         </ic:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    </i:Interaction.Behaviors>-->
     <Grid x:Name="ContentArea">
         <StackPanel>
+            <TextBlock Margin="0,0,0,10" Text="{x:Bind ViewModel.SubscriptionId, Mode=OneTime}"/>
             <NumberBox Value="{x:Bind ViewModel.Value, Mode=TwoWay}"/>
             <NumberBox Value="{x:Bind ViewModel.Value1, Mode=TwoWay}"/>
             <TextBlock Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}" Text="HasError"/>

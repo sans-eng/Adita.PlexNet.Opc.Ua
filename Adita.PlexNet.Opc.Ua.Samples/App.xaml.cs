@@ -104,7 +104,7 @@ public partial class App : Application
          .SetLoggerFactory(loggerFactory)
          .AddMappedEndpoint("Main", new EndpointDescription()
          {
-             EndpointUrl = "opc.tcp://192.168.5.99:4840",
+             EndpointUrl = "opc.tcp://192.168.5.77:4840",
              SecurityMode = MessageSecurityMode.None,
              SecurityPolicyUri = SecurityPolicyUris.None
          }).Build();

@@ -1,95 +1,65 @@
 ﻿namespace Adita.PlexNet.Opc.Ua.Options;
 
+/// <summary>
+/// Represents configuration options for OPC UA operation limits.
+/// </summary>
 public class OperationLimitsOptions
 {
     #region Public properties
     /// <summary>
-    /// Gets or sets the maximum number of nodes per read operation.
+    /// Gets or sets the maximum number of nodes per read operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerRead
-    {
-        get; set;
-    }
+    public uint MaxNodesPerRead { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per write operation.
+    /// Gets or sets the maximum number of nodes per write operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerWrite
-    {
-        get; set;
-    }
+    public uint MaxNodesPerWrite { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per history read data operation.
+    /// Gets or sets the maximum number of nodes per history read data operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerHistoryReadData
-    {
-        get; set;
-    }
+    public uint MaxNodesPerHistoryReadData { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per history read events operation.
+    /// Gets or sets the maximum number of nodes per history read events operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerHistoryReadEvents
-    {
-        get; set;
-    }
+    public uint MaxNodesPerHistoryReadEvents { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per history update data operation.
+    /// Gets or sets the maximum number of nodes per history update data operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerHistoryUpdateData
-    {
-        get; set;
-    }
+    public uint MaxNodesPerHistoryUpdateData { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per method call operation.
+    /// Gets or sets the maximum number of nodes per method call operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerMethodCall
-    {
-        get; set;
-    }
+    public uint MaxNodesPerMethodCall { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per browse operation.
+    /// Gets or sets the maximum number of nodes per browse operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerBrowse
-    {
-        get; set;
-    }
+    public uint MaxNodesPerBrowse { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per register nodes operation.
+    /// Gets or sets the maximum number of nodes per register nodes operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerRegisterNodes
-    {
-        get; set;
-    }
+    public uint MaxNodesPerRegisterNodes { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per translate browse paths to node IDs operation.
+    /// Gets or sets the maximum number of nodes per translate browse paths to node IDs operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerTranslateBrowsePathsToNodeIds
-    {
-        get; set;
-    }
+    public uint MaxNodesPerTranslateBrowsePathsToNodeIds { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of nodes per node management operation.
+    /// Gets or sets the maximum number of nodes per node management operation. Default is 1000.
     /// </summary>
-    public uint MaxNodesPerNodeManagement
-    {
-        get; set;
-    }
+    public uint MaxNodesPerNodeManagement { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets the maximum number of monitored items per call operation.
+    /// Gets or sets the maximum number of monitored items per call operation. Default is 100.
     /// </summary>
-    public uint MaxMonitoredItemsPerCall
-    {
-        get; set;
-    }
+    public uint MaxMonitoredItemsPerCall { get; set; } = 100;
 
     #endregion Public properties
 }
